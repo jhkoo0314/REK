@@ -70,17 +70,17 @@
 
 ## 2. Dev DB와 매물 기본 구조
 
-- [ ] `organizations` migration 작성
-- [ ] `organization_members` migration 작성
-- [ ] `buildings` migration 작성
-- [ ] `units` migration 작성
-- [ ] `listings` migration 작성
-- [ ] 모든 업무 테이블에 `organization_id` 포함
-- [ ] 생성·수정 시각·사용자 기록 포함
-- [ ] 건물 중복 방지 제약 추가
-- [ ] `302`와 `302호` 중복 방지 규칙 추가
-- [ ] 호실당 현재 매물 1건 제약 추가
-- [ ] 금액·날짜·상태 기본 검증 추가
+- [x] `organizations` migration 작성 — Dev 적용 대기
+- [x] `organization_members` migration 작성 — Dev 적용 대기
+- [x] `buildings` migration 작성 — Dev 적용 대기
+- [x] `units` migration 작성 — Dev 적용 대기
+- [x] `listings` migration 작성 — Dev 적용 대기
+- [ ] 모든 업무 테이블에 `organization_id` 포함 — 현재 작성된 P0 매물 기본 구조에는 적용, 상담·계약·광고 추가 시 완료
+- [ ] 생성·수정 시각·사용자 기록 포함 — 현재 작성된 P0 매물 기본 구조에는 적용, 후속 업무 테이블 추가 시 완료
+- [x] 건물 중복 방지 제약 추가 — Dev 적용 대기
+- [x] `302`와 `302호` 중복 방지 규칙 추가 — Dev 적용 대기
+- [x] 호실당 현재 매물 1건 제약 추가 — Dev 적용 대기
+- [x] 금액·날짜·상태 기본 검증 추가 — Dev 적용 대기
 - [ ] TypeScript DB 타입 생성
 - [ ] 조직 A/B와 테스트 계정 seed 준비
 - [ ] 가공 건물·호실·매물 seed 준비

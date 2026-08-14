@@ -1,0 +1,4 @@
+interface:
+  display_name: "Real Estate Build"
+  short_description: "Read project context and start an approved build safely."
+  default_prompt: "Use $realestate-build to understand this project and begin the next approved build task."

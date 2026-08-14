@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ko" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부동산 유형별 확장 디자인 시안 - Modern Minimal Luxury (배방우리부동산)</title>
+    <!-- Tailwind CSS with plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        },
+                        surface: {
+                            bg: '#F8FAFC',
+                            card: '#FFFFFF',
+                            subtle: '#F1F5F9',
+                            border: '#E2E8F0'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Roboto Mono', 'monospace']
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 500;
+        }
+    </style>
+</head>
+<body class="bg-surface-bg text-slate-800 font-sans antialiased h-screen overflow-hidden flex">
+
+    <!-- Sidebar Navigation -->
+    <aside class="hidden md:flex flex-col w-64 bg-white border-r border-surface-border h-full flex-shrink-0 z-20">
+        <div class="p-6 flex items-center gap-3 border-b border-slate-100">
+            <img alt="배방우리부동산 로고" class="w-10 h-10 rounded-xl object-cover shadow-sm border border-slate-200" src="https://lh3.googleusercontent.com/aida/AP1WRLsO21bZMPDfsHhId7c2m_nD1vaF0_aNXUBQS87IGjPngD67pXP-gjPEbhxjc8gcd4UEAkEJ4v80FVVCfYhkASpC78Thuj_KAAX84Gwx5JOpDplBjW_bvUI730bAwF7vmJf8rWNE_wvMfZ1EjI4DTrw8_Y7MkIwISiXMciZYtlrpcGxqZ4VIdcqhQg_qh7-HQJbLJ6_VQyAlSKrrkgi-Xm6OTB234SR3gDfvOWhUdLDEHRCfl3HCxetXyg"/>
+            <div>
+                <h1 class="font-bold text-slate-900 leading-tight">배방우리부동산</h1>
+                <p class="text-xs text-slate-500 font-medium mt-0.5">Category Expansion Plan</p>
+            </div>
+        </div>
+
+        <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
+            <a href="light_property_list.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-brand-50 text-brand-700 font-semibold transition-all">
+                <span class="material-symbols-outlined icon-fill text-brand-600">category</span>
+                <span class="text-sm">부동산 유형 확장 시안</span>
+            </a>
+            <a href="light_minimal_luxury.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium transition-all">
+                <span class="material-symbols-outlined text-slate-400">dashboard</span>
+                <span class="text-sm">대시보드</span>
+            </a>
+            <a href="light_property_list.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium transition-all">
+                <span class="material-symbols-outlined text-slate-400">real_estate_agent</span>
+                <span class="text-sm">원/투룸 기본 매물</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-surface-bg">
+
+        <!-- Top Header Bar -->
+        <header class="h-16 bg-white border-b border-surface-border px-8 flex items-center justify-between z-10">
+            <div>
+                <h2 class="text-xl font-bold text-slate-900">부동산 유형별 기능 확장 설계 (Expansion Blueprint)</h2>
+                <p class="text-xs text-slate-500 font-medium">원/투룸 → 아파트, 오피스텔, 상가/사무실 유연한 확장 UI 가이드</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold">확장 컴포넌트 설계 완료</span>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 overflow-y-auto p-8 space-y-8 max-w-7xl mx-auto w-full">
+
+            <!-- Strategy Banner -->
+            <div class="bg-gradient-to-r from-brand-900 via-blue-900 to-slate-900 text-white rounded-2xl p-6 shadow-soft space-y-3">
+                <div class="flex items-center gap-2 text-brand-300 text-xs font-bold uppercase tracking-wider">
+                    <span class="material-symbols-outlined text-sm">architecture</span>
+                    <span>확장 디자인 핵심 원칙 (Architecture Concept)</span>
+                </div>
+                <h3 class="text-lg font-bold text-white">기존 화면 구조를 깨지 않고, 부동산 유형별 특화 항목을 "동적 컴포넌트"로 스위칭</h3>
+                <p class="text-xs text-slate-300 leading-relaxed max-w-4xl">
+                    모든 부동산(원룸, 아파트, 상가, 오피스텔)은 **`건물 → 호실 → 매물`** 기본 관계를 100% 공유합니다. 
+                    유형 확장 시 화면 전체를 새로 만들지 않고, <b>1) 카테고리 탭 2) 유형별 맞춤 필터 3) 동적 입력 폼(권리금/업종/주차)</b>만 조립형으로 전환되도록 설계합니다.
+                </p>
+            </div>
+
+            <!-- SECTION 1: Category Filter Bar Design -->
+            <div class="bg-surface-card rounded-2xl p-6 border border-surface-border shadow-soft space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-900">1. 매물 목록 상단 카테고리 탭 & 유형별 동적 필터 디자인</h4>
+                        <p class="text-xs text-slate-500 mt-0.5">카테고리를 클릭하면 아래 필터 바의 검색 항목이 해당 유형 특화 조건으로 자동 변경됩니다.</p>
+                    </div>
+                </div>
+
+                <!-- Category Switcher Tabs -->
+                <div class="flex items-center gap-2 border-b border-slate-200 pb-2">
+                    <button class="px-4 py-2 bg-brand-600 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-sm">
+                        <span class="material-symbols-outlined text-sm">storefront</span>
+                        <span>상가 · 사무실 (84건)</span>
+                    </button>
+                    <button class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold rounded-xl text-xs flex items-center gap-1.5 transition-all">
+                        <span class="material-symbols-outlined text-sm">apartment</span>
+                        <span>아파트 (120건)</span>
+                    </button>
+                    <button class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold rounded-xl text-xs flex items-center gap-1.5 transition-all">
+                        <span class="material-symbols-outlined text-sm">business_center</span>
+                        <span>오피스텔 (45건)</span>
+                    </button>
+                    <button class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold rounded-xl text-xs flex items-center gap-1.5 transition-all">
+                        <span class="material-symbols-outlined text-sm">single_bed</span>
+                        <span>원 / 투룸 (148건)</span>
+                    </button>
+                </div>
+
+                <!-- Dynamic Filter Bar for Commercial (상가/사무실 전용 필터 모드) -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between text-xs text-slate-500 font-bold">
+                        <span class="text-brand-600 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">tune</span>
+                            <span>상가/사무실 특화 필터 조건</span>
+                        </span>
+                        <span>권리금 / 업종 / 전력용량 / 1층 여부 선택 가능</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">권리금 유무</label>
+                            <select class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg outline-none font-semibold">
+                                <option>전체 (무권리+유권리)</option>
+                                <option class="text-emerald-600 font-bold">✨ 무권리 상가만</option>
+                                <option>권리금 3,000만 이하</option>
+                                <option>권리금 협의</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">추천/가능 업종</label>
+                            <select class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg outline-none font-semibold">
+                                <option>전체 업종</option>
+                                <option>☕ 카페 / 디저트</option>
+                                <option>🍗 일반음식점 / 휴게음식점</option>
+                                <option>🏥 병의원 / 약국</option>
+                                <option>💇 미용 / 뷰티 / 네일</option>
+                                <option>🏢 일반 사무실 / 오피스</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">층수 및 1층 여부</label>
+                            <select class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg outline-none font-semibold">
+                                <option>전체 층</option>
+                                <option>1층 전면 상가만</option>
+                                <option>2층 이상 (음식점/학원)</option>
+                                <option>지하 / 대형 평형</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">전기 / 수도 / 엘리베이터</label>
+                            <select class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg outline-none font-semibold">
+                                <option>조건 선택 없음</option>
+                                <option>전력 10kW 이상 (음식점)</option>
+                                <option>엘리베이터 필수</option>
+                                <option>남녀 분리 화장실</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- SECTION 2: Table Column Adaptation Showcase -->
+            <div class="bg-surface-card rounded-2xl border border-surface-border shadow-soft overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-900">2. 부동산 유형별 테이블 열(Column) 동적 변형 예시</h4>
+                        <p class="text-xs text-slate-500 mt-0.5">상가 선택 시 '권리금/추천업종/전기' 항목이 테이블 주요 열로 즉시 전환됩니다.</p>
+                    </div>
+                    <span class="bg-brand-50 text-brand-700 text-xs px-3 py-1 rounded-full font-bold">상가/사무실 목록 보기</span>
+                </div>
+
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50/70 border-b border-surface-border text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                            <th class="py-3.5 px-6">상가/사무실명</th>
+                            <th class="py-3.5 px-6">층 / 면적(전용)</th>
+                            <th class="py-3.5 px-6">보증금 / 월세</th>
+                            <th class="py-3.5 px-6 text-brand-700 bg-brand-50/40">권리금 (특화)</th>
+                            <th class="py-3.5 px-6 text-brand-700 bg-brand-50/40">추천 업종 (특화)</th>
+                            <th class="py-3.5 px-6">시설/전력 용량</th>
+                            <th class="py-3.5 px-6 text-right">상태/액션</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-xs">
+                        
+                        <!-- Commercial Row 1 -->
+                        <tr class="hover:bg-slate-50/60 transition-all">
+                            <td class="py-4 px-6">
+                                <div class="font-bold text-slate-900">배방역 메디컬프라자 105호</div>
+                                <div class="text-[10px] text-slate-400 font-medium">1층 전면 대로변 상가</div>
+                            </td>
+                            <td class="py-4 px-6 font-mono">
+                                <div class="font-bold text-slate-800">1층 / 49.5㎡</div>
+                                <div class="text-[10px] text-slate-400">(약 15평)</div>
+                            </td>
+                            <td class="py-4 px-6 font-mono font-bold text-slate-900">
+                                5,000 / <span class="text-brand-600">월 250만</span>
+                            </td>
+                            <td class="py-4 px-6 font-mono bg-brand-50/20">
+                                <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold text-[11px]">
+                                    ✨ 무권리금
+                                </span>
+                            </td>
+                            <td class="py-4 px-6 bg-brand-50/20">
+                                <div class="flex flex-wrap gap-1">
+                                    <span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] font-medium">☕ 카페</span>
+                                    <span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] font-medium">💊 약국</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6 text-slate-600 font-medium">
+                                전력 15kW · 닥트 시설 완비
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                <span class="bg-emerald-100 text-emerald-800 text-[11px] px-2.5 py-1 rounded-full font-bold">
+                                    공실 (즉시시공)
+                                </span>
+                            </td>
+                        </tr>
+
+                        <!-- Commercial Row 2 -->
+                        <tr class="hover:bg-slate-50/60 transition-all">
+                            <td class="py-4 px-6">
+                                <div class="font-bold text-slate-900">공수리 리더스타워 302호</div>
+                                <div class="text-[10px] text-slate-400 font-medium">3층 엘리베이터 앞 오피스</div>
+                            </td>
+                            <td class="py-4 px-6 font-mono">
+                                <div class="font-bold text-slate-800">3층 / 99.1㎡</div>
+                                <div class="text-[10px] text-slate-400">(약 30평)</div>
+                            </td>
+                            <td class="py-4 px-6 font-mono font-bold text-slate-900">
+                                3,000 / <span class="text-brand-600">월 140만</span>
+                            </td>
+                            <td class="py-4 px-6 font-mono bg-brand-50/20">
+                                <span class="text-slate-800 font-bold">1,500만 원</span>
+                                <div class="text-[10px] text-slate-400">(시설비 포함)</div>
+                            </td>
+                            <td class="py-4 px-6 bg-brand-50/20">
+                                <div class="flex flex-wrap gap-1">
+                                    <span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] font-medium">🏢 사무실</span>
+                                    <span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] font-medium">✏️ 교습소/학원</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6 text-slate-600 font-medium">
+                                천장형 냉난방 2대 · 룸 3개 구획
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                <span class="bg-amber-100 text-amber-800 text-[11px] px-2.5 py-1 rounded-full font-bold">
+                                    협의 가능
+                                </span>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SECTION 3: Dynamic Form Input Schema Preview -->
+            <div class="bg-surface-card rounded-2xl p-6 border border-surface-border shadow-soft space-y-4">
+                <div class="border-b border-slate-100 pb-3">
+                    <h4 class="text-sm font-bold text-slate-900">3. 매물 등록 위저드 Form (Step 3) 동적 세부 항목 설계</h4>
+                    <p class="text-xs text-slate-500 mt-0.5">매물 유형 선택에 따라 Form 하단에 전용 스키마 입력란이 생성됩니다.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <!-- Form Extension 1: 원/투룸 -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-800">🏠 원/투룸/빌라 전용 항목</span>
+                            <span class="text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-bold">기본</span>
+                        </div>
+                        <ul class="text-xs text-slate-600 space-y-1.5 font-medium">
+                            <li class="flex items-center gap-1.5">✅ 풀옵션 선택 (세탁기/냉장고/에어컨)</li>
+                            <li class="flex items-center gap-1.5">✅ 관리비 포함 항목 (인터넷/수도)</li>
+                            <li class="flex items-center gap-1.5">✅ 주차 가능 대수 & 엘리베이터 여부</li>
+                        </ul>
+                    </div>
+
+                    <!-- Form Extension 2: 아파트/오피스텔 -->
+                    <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-200 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-brand-900">🏢 아파트 / 오피스텔 전용 항목</span>
+                            <span class="text-[10px] bg-brand-100 text-brand-800 px-2 py-0.5 rounded font-bold">확장</span>
+                        </div>
+                        <ul class="text-xs text-brand-900 space-y-1.5 font-medium">
+                            <li class="flex items-center gap-1.5">✅ 공급면적 / 전용면적 / 평형 선택</li>
+                            <li class="flex items-center gap-1.5">✅ 방 수 / 욕실 수 / 베란다 확장 여부</li>
+                            <li class="flex items-center gap-1.5">✅ 주거용 vs 업무용 구분 (오피스텔)</li>
+                            <li class="flex items-center gap-1.5">✅ 세대당 주차대수 & 난방 방식</li>
+                        </ul>
+                    </div>
+
+                    <!-- Form Extension 3: 상가/사무실 -->
+                    <div class="bg-purple-50/50 p-4 rounded-xl border border-purple-200 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-purple-900">🏪 상가 / 사무실 전용 항목</span>
+                            <span class="text-[10px] bg-purple-100 text-purple-800 px-2 py-0.5 rounded font-bold">확장</span>
+                        </div>
+                        <ul class="text-xs text-purple-900 space-y-1.5 font-medium">
+                            <li class="flex items-center gap-1.5">✅ 권리금 (금액 / 무권리금 / 협의)</li>
+                            <li class="flex items-center gap-1.5">✅ 추천 및 허가 가능 업종 태그 입력</li>
+                            <li class="flex items-center gap-1.5">✅ 전력 용량(kW) & 수도/배수/닥트 여부</li>
+                            <li class="flex items-center gap-1.5">✅ 남녀 분리 화장실 & 전면 간판 위치</li>
+                        </ul>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>
