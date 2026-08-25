@@ -40,17 +40,19 @@ Gemini 결과는 사용자 승인 후 Codex가 실제 프로젝트 코드로 구
 
 | 우선 | 문서 | 역할 |
 | --- | --- | --- |
-| 1 | `web_service_prd_v1.md` | 제품 목적과 1차 범위 |
-| 2 | `supabase_data_model_v1.md` | 데이터 구조와 관계 |
-| 3 | `web_workflow_spec_v1.md` | 실제 업무 흐름과 업무 규칙 |
-| 4 | `web_screen_spec_wireframe_v1.md` | 화면 구성과 UX 기준 |
-| 5 | `web_technical_architecture_v1.md` | 기술 구조와 폴더·환경 기준 |
-| 6 | `supabase_security_transition_plan.md` | Dev→Production 보안 전환 |
-| 7 | `user_access_policy_v1.md` | 사용자·역할·조직 권한 |
-| 8 | `web_implementation_plan_v1.md` | 구현 우선순위와 순서 |
-| 9 | `web_test_acceptance_v1.md` | 테스트·수용 기준 |
-| 10 | `production_release_checklist_v1.md` | Production 배포·운영 시작 기준 |
-| 11 | `hybrid_development_working_agreement_v1.md` | Codex·Gemini 하이브리드 협업 규칙 |
+| 1 | `REBUILD_MASTER_SPEC.md` | 재빌드 범위·업무·보안·폴더 구조의 최상위 기준 |
+| 2 | `TODO.md` | 현재 단계의 실제 작업 순서와 완료 체크 |
+| 3 | `CURRENT_IMPLEMENTATION_STATUS.md` | 실제 구현·검증·남은 작업의 현재 상태 |
+| 4 | `web_service_prd_v1.md` | 제품 목적과 1차 범위 |
+| 5 | `supabase_data_model_v1.md` | 데이터 구조와 관계 |
+| 6 | `web_workflow_spec_v1.md` | 실제 업무 흐름과 업무 규칙 |
+| 7 | `web_screen_spec_wireframe_v1.md` | 화면 구성과 UX 기준 |
+| 8 | `web_technical_architecture_v1.md` | 기술 구조와 폴더·환경 기준 |
+| 9 | `supabase_security_transition_plan.md` | Dev→Production 보안 전환 |
+| 10 | `user_access_policy_v1.md` | 사용자·역할·조직 권한 |
+| 11 | `web_test_acceptance_v1.md` | 테스트·수용 기준 |
+| 12 | `production_release_checklist_v1.md` | Production 배포·운영 시작 기준 |
+| 13 | `hybrid_development_working_agreement_v1.md` | Codex·Gemini 하이브리드 협업 규칙 |
 
 ---
 
@@ -209,6 +211,8 @@ P0가 통과되기 전에는 P2/P3 기능을 먼저 구현하지 않는다.
 - [ ] 문서·작업 상태에 영향이 있으면 함께 갱신한다.
 - [ ] 새 UI가 기존 공통 컴포넌트를 재사용하는지, 중복 컴포넌트를 만들지 않았는지 확인한다.
 - [ ] 기능·디자인·DB 구조 빌드 작업을 마친 뒤 `docs/BUILD_PROGRESS.md`에 완료 내용, 확인 결과, migration 적용 여부, 다음 작업을 갱신한다.
+- [ ] 각 TODO 단계 또는 독립 기능을 마친 뒤 `docs/CURRENT_IMPLEMENTATION_STATUS.md`에 실제 구현 범위, 코드 검사·브라우저 확인 결과, DB 적용 여부, 남은 항목을 갱신한다.
+- [ ] 기능 범위·실행 방법·현재 단계가 바뀌면 루트 `README.md`의 요약을 갱신한다.
 
 ---
 

@@ -38,6 +38,17 @@
 - 기본 목록과 오늘 할 일에는 연락처·출입 비밀번호·내부 메모를 표시하지 않는다. 상세에서도 민감 정보는 접어서 표시한다.
 - 금액은 만원 단위 정수, 업무 날짜는 시간 없는 날짜로 저장한다.
 
+## 3-1. 향후 매물 종류 확장 준비
+
+P0의 실제 입력·화면·검증 대상은 원룸·투룸 중심으로 유지한다. 다만 DB 이름, 상태값, 공통 화면 구조는 아파트·오피스텔·상가·사무실까지 수용할 수 있게 만든다.
+
+- 매물에는 `property_type`(원룸 / 투룸 / 아파트 / 오피스텔 / 상가 / 사무실) 구분값을 둔다.
+- 원룸·투룸 같은 방 구조는 주거형 매물에만 쓰는 별도 값으로 두며, 상가·사무실에는 비워 둘 수 있다.
+- 상태는 공실, 계약 진행, 계약 완료, 보류, 종료처럼 모든 매물 종류에 쓸 수 있는 공통 표현을 사용한다.
+- 주소, 호실, 층, 면적, 가격, 관리비, 거래 방식, 입주 가능일은 공통 항목으로 유지한다.
+- 아파트의 단지·동·공급면적, 상가의 권리금·부가세·용도 같은 전용 항목은 지금 추가하지 않는다. 실제 도입 전 별도 데이터 모델·화면·테스트 승인 뒤 migration으로 추가한다.
+- 종류별 특수 항목을 이유로 일반 매물 테이블에 미리 많은 빈 열을 만들거나, 의미 없는 범용 메모 칸에 구조화된 정보를 넣지 않는다.
+
 ## 4. 데이터와 보안 기준
 
 - 모든 업무 테이블은 `organization_id`를 포함한다. 브라우저에서 받은 조직 ID를 신뢰하지 않는다.
@@ -64,6 +75,72 @@ supabase/migrations/         순서가 있는 DB 변경 파일
 
 각 `app/**/page.tsx`는 화면 조립만 한다. 큰 카드·표·폼은 해당 `features` 폴더에 둔다. 승인된 `docs/Design_guide/`의 색상·글꼴·정보 위계·문구를 사용한다.
 
+### 코드 분리 원칙
+
+- 한 화면 파일에 화면·입력 검증·DB 저장·표·다이얼로그를 모두 작성하지 않는다.
+- 화면 단위 기능은 `features/<기능>/` 아래에 두고, 화면 부품은 `components/`, 서버 처리와 조회는 `server/`, 입력 검증은 `schemas/`처럼 역할별로 나눈다.
+- 둘 이상의 업무 화면에서 같은 역할을 하는 UI는 `components/shared/`에 한 번만 둔다.
+- 기본 버튼·입력칸·다이얼로그 같은 작은 기반 부품은 `components/ui/`에 둔다.
+- 공통 권한·날짜·금액·DB 연결은 `lib/`에 둔다.
+- 파일 하나가 두 가지 이상의 큰 역할을 하거나 읽기 어려울 정도로 길어지면 분리한다. 반대로 재사용되지 않는 아주 작은 표시 요소까지 억지로 공통 파일로 만들지는 않는다.
+
+### 확정 폴더 트리
+
+아래 구조를 재빌드의 기본 구조로 고정한다. 새 기능은 임의의 최상위 폴더를 만들지 않고, 가장 알맞은 기존 업무 폴더 아래에 추가한다.
+
+```text
+app/
+  (app)/
+    dashboard/
+    listings/
+      new/
+      [listingId]/
+        edit/
+    buildings/
+    consultations/
+    contracts/
+    advertisements/
+  sign-in/
+  sign-up/
+components/
+  ui/
+  shared/
+features/
+  listings/
+    components/
+    server/
+    schemas/
+  consultations/
+    components/
+    server/
+    schemas/
+  contracts/
+    components/
+    server/
+    schemas/
+  tasks/
+    components/
+    server/
+  advertisements/
+    components/
+    server/
+    schemas/
+  exports/
+  members/
+lib/
+  auth/
+  clerk/
+  supabase/
+supabase/
+  migrations/
+  seeds/
+tests/
+docs/
+  Design_guide/
+```
+
+`app` 아래에는 페이지·라우트 파일만, `features` 아래에는 업무별 코드만 둔다. 아파트·오피스텔·상가·사무실 확장은 새 최상위 기능 폴더를 만들지 않고 `features/listings/` 안의 종류별 컴포넌트·검증 파일로 추가한다.
+
 ## 6. DB 재시작 원칙
 
 코드 재빌드와 Dev DB 초기화는 별도 작업이다.
@@ -83,3 +160,16 @@ supabase/migrations/         순서가 있는 DB 변경 파일
 - P2: admin/staff/inactive/다른 조직 계정, PC·모바일, 저장 오류·빈 화면·권한 없음, RLS와 Production 전환 조건을 확인한다.
 
 모든 단계는 lint·typecheck·build·관련 테스트와 실제 브라우저 확인을 구분해 기록한다.
+
+## 8. 단계 종료 기록 규칙
+
+각 TODO 단계 또는 독립 기능을 끝낼 때 아래 문서를 같은 작업에서 갱신한다.
+
+| 문서 | 기록할 내용 |
+| --- | --- |
+| `TODO.md` | 실제 완료한 체크 항목만 표시 |
+| `CURRENT_IMPLEMENTATION_STATUS.md` | 구현 범위, 코드 검사·브라우저 확인 결과, DB 적용 여부, 남은 작업 |
+| `BUILD_PROGRESS.md` | 재빌드 전체 판단, 다음 안전한 작업, 사용자 승인 필요 사항 |
+| 루트 `README.md` | 사용자에게 보이는 현재 단계, 실행 방법, 문서 사용 순서 |
+
+migration 파일을 작성한 것과 Dev DB에 적용한 것을 반드시 구분한다. 코드 검사를 하지 못했거나 브라우저 확인이 남았으면 그 사실을 그대로 기록한다.
