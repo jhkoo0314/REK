@@ -144,7 +144,7 @@ Python은 기존 SQLite 확인, 일회성 자료 정리, OCR·사진 일괄 처�
 
 - 모든 화면은 `app/**/page.tsx`를 **조립 전용 파일**로 유지한다. 페이지 파일에는 화면의 순서와 데이터 연결만 두고, 큰 카드·표·폼·섹션의 JSX를 길게 작성하지 않는다.
 - 화면 전용 UI는 해당 업무 폴더의 `features/<업무>/components/`에 둔다. 예: 대시보드의 `DashboardHero`, `MetricCard`, `TodayTasksCard`.
-- 둘 이상의 화면에서 같은 역할·모양으로 쓰는 UI는 `components/shared/`에 한 번만 만들고 각 페이지가 import해서 사용한다. 예: `AppShell`, `PageHeader`, `StatusBadge`, `DataTableFrame`, `SensitiveInfo`.
+- 둘 이상의 화면에서 같은 역할·모양으로 쓰는 UI는 `components/shared/`에 한 번만 만들고 각 페이지가 import해서 사용한다. 예: `AppShell`, `PageHeader`, `StatusBadge`, `DataTableFrame`.
 - shadcn의 기초 버튼·입력칸·다이얼로그처럼 아주 기본적인 UI는 `components/ui/`에 둔다. 업무 규칙을 담은 컴포넌트는 여기에 두지 않는다.
 - 같은 이름의 상태 색상, 버튼 스타일, 표 구조를 페이지마다 복사하지 않는다. 공통 컴포넌트를 확장하거나 필요한 속성(props)을 추가한다.
 - 재사용 가능성이 아직 없는 아주 작은 표시 요소까지 억지로 공통화하지 않는다. 대신 한 화면의 컴포넌트가 길어지거나 역할이 둘 이상이면 분리한다.
