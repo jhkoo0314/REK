@@ -74,7 +74,7 @@ supabase/migrations/         순서가 있는 DB 변경 파일
 4. 가공 조직·가공 계정·가공 매물 seed를 넣고 브라우저 흐름을 확인한다.
 5. Production DB·Clerk Production·기존 SQLite는 이 과정에서 절대 바꾸지 않는다.
 
-현재 `supabase/`의 기존 migration과 seed는 이전 시도 기록으로 보존한다. 새 재빌드의 migration을 그대로 재사용할지, 새 번호로 교체할지는 P0 데이터 모델 검토 뒤 결정한다.
+기존 재빌드 전 migration과 seed는 삭제했다. 새 P0 데이터 모델 검토 뒤, 새 migration과 가공 seed를 처음부터 작성한다.
 
 ## 7. 완료 기준
 

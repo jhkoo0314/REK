@@ -8,8 +8,8 @@
 
 - Streamlit 시스템을 기준으로 웹을 처음부터 다시 구현하기로 결정했다.
 - 기존 Next.js 코드·가공 화면·기존 기능 구현은 재사용하지 않는다.
-- Clerk·Supabase의 원격 설정, 로컬 `.env.local`, `supabase/`, `docs/Design_guide/`, 문서와 Git 이력은 보존한다.
-- 기존 Dev DB migration과 seed는 과거 시도 기록으로 보존한다. Dev DB의 초기화·재적용은 아직 승인되지 않았다.
+- Clerk·Supabase의 원격 설정, 로컬 `.env.local`, `docs/Design_guide/`, 문서와 Git 이력은 보존한다.
+- 기존 로컬 migration과 seed는 재빌드 기준으로 삭제했다. Dev DB의 초기화·새 migration 적용은 아직 승인되지 않았다.
 - 기존 Streamlit SQLite 데이터는 읽기 전용으로 보관하며 자동 이관하지 않는다.
 
 ## 이번 재빌드에서 확인한 사항
