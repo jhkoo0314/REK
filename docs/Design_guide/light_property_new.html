@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ko" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신규 매물 등록 - Modern Minimal Luxury (배방우리부동산)</title>
+    <!-- Tailwind CSS with plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        },
+                        surface: {
+                            bg: '#F8FAFC',
+                            card: '#FFFFFF',
+                            subtle: '#F1F5F9',
+                            border: '#E2E8F0'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Roboto Mono', 'monospace']
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 500;
+        }
+    </style>
+</head>
+<body class="bg-surface-bg text-slate-800 font-sans antialiased h-screen overflow-hidden flex">
+
+    <!-- Sidebar Navigation -->
+    <aside class="hidden md:flex flex-col w-64 bg-white border-r border-surface-border h-full flex-shrink-0 z-20">
+        <div class="p-6 flex items-center gap-3 border-b border-slate-100">
+            <img alt="배방우리부동산 로고" class="w-10 h-10 rounded-xl object-cover shadow-sm border border-slate-200" src="https://lh3.googleusercontent.com/aida/AP1WRLsO21bZMPDfsHhId7c2m_nD1vaF0_aNXUBQS87IGjPngD67pXP-gjPEbhxjc8gcd4UEAkEJ4v80FVVCfYhkASpC78Thuj_KAAX84Gwx5JOpDplBjW_bvUI730bAwF7vmJf8rWNE_wvMfZ1EjI4DTrw8_Y7MkIwISiXMciZYtlrpcGxqZ4VIdcqhQg_qh7-HQJbLJ6_VQyAlSKrrkgi-Xm6OTB234SR3gDfvOWhUdLDEHRCfl3HCxetXyg"/>
+            <div>
+                <h1 class="font-bold text-slate-900 leading-tight">배방우리부동산</h1>
+                <p class="text-xs text-slate-500 font-medium mt-0.5">SaaS Partner Platform</p>
+            </div>
+        </div>
+
+        <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
+            <a href="light_minimal_luxury.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium transition-all">
+                <span class="material-symbols-outlined text-slate-400">dashboard</span>
+                <span class="text-sm">대시보드 Overview</span>
+            </a>
+            <a href="light_property_list.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-brand-50 text-brand-700 font-semibold transition-all">
+                <span class="material-symbols-outlined icon-fill text-brand-600">real_estate_agent</span>
+                <span class="text-sm">매물 통합 관리</span>
+                <span class="ml-auto bg-brand-200 text-brand-800 text-xs font-bold px-2 py-0.5 rounded-full">148</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium transition-all">
+                <span class="material-symbols-outlined text-slate-400">forum</span>
+                <span class="text-sm">상담 및 고객 DB</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium transition-all">
+                <span class="material-symbols-outlined text-slate-400">history_edu</span>
+                <span class="text-sm">계약 관리 센터</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Form Workspace -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-surface-bg">
+
+        <!-- Header Bar -->
+        <header class="h-16 bg-white border-b border-surface-border px-8 flex items-center justify-between z-10">
+            <div class="flex items-center gap-3">
+                <a href="light_property_list.html" class="p-1.5 hover:bg-slate-100 rounded-xl transition-all text-slate-500">
+                    <span class="material-symbols-outlined text-xl">arrow_back</span>
+                </a>
+                <h2 class="text-xl font-bold text-slate-900">신규 매물 등록 (SCR-04)</h2>
+                <span class="text-xs text-slate-400 font-medium">건물 → 호실 → 매물 조건 3단계 단계별 등록</span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <a href="light_property_list.html" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200 transition-all">
+                    취소
+                </a>
+                <button class="bg-brand-600 hover:bg-brand-700 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-soft shadow-brand-600/30 transition-all">
+                    매물 등록 완료
+                </button>
+            </div>
+        </header>
+
+        <!-- Form Scroll Area -->
+        <div class="flex-1 overflow-y-auto p-8 space-y-6 max-w-4xl mx-auto w-full">
+
+            <!-- Stepper Indicator Card -->
+            <div class="bg-surface-card rounded-2xl p-6 border border-surface-border shadow-soft">
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    
+                    <!-- Step 1: Completed -->
+                    <div class="flex items-center gap-3 text-left">
+                        <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                            <span class="material-symbols-outlined text-base">check</span>
+                        </div>
+                        <div>
+                            <span class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">STEP 1</span>
+                            <h4 class="text-xs font-bold text-slate-900">건물 선택/등록</h4>
+                            <p class="text-[10px] text-slate-400">센트럴 푸르지오</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Completed -->
+                    <div class="flex items-center gap-3 text-left border-l border-slate-100 pl-4">
+                        <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                            <span class="material-symbols-outlined text-base">check</span>
+                        </div>
+                        <div>
+                            <span class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">STEP 2</span>
+                            <h4 class="text-xs font-bold text-slate-900">호실 선택</h4>
+                            <p class="text-[10px] text-slate-400">101동 402호</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Active -->
+                    <div class="flex items-center gap-3 text-left border-l border-slate-100 pl-4">
+                        <div class="w-10 h-10 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold text-sm shadow-md ring-4 ring-brand-100">
+                            3
+                        </div>
+                        <div>
+                            <span class="text-[11px] font-bold text-brand-600 uppercase tracking-wider">STEP 3</span>
+                            <h4 class="text-xs font-bold text-slate-900">매물 조건 입력</h4>
+                            <p class="text-[10px] text-brand-600 font-semibold">입력 진행 중</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- STEP 1 Summary Card -->
+            <div class="bg-surface-card rounded-2xl p-6 border border-surface-border shadow-soft flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-brand-600 flex items-center justify-center font-bold">
+                        <span class="material-symbols-outlined text-2xl">domain</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-base font-bold text-slate-900">센트럴 푸르지오</h3>
+                            <span class="bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded font-semibold">아파트 / 주거용</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">충청남도 아산시 배방읍 공수리 123-45 · 총 120세대</p>
+                    </div>
+                </div>
+                <button class="text-xs font-semibold text-brand-600 hover:bg-brand-50 px-3 py-1.5 rounded-xl border border-brand-200 transition-all">
+                    건물 변경
+                </button>
+            </div>
+
+            <!-- STEP 2 Summary Card -->
+            <div class="bg-surface-card rounded-2xl p-6 border border-surface-border shadow-soft flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                        <span class="material-symbols-outlined text-2xl">door_front</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-base font-bold text-slate-900">101동 402호</h3>
+                            <span class="bg-emerald-100 text-emerald-800 text-[10px] bg-emerald-50 px-2 py-0.5 rounded font-bold">등록 가능 (중복 없음)</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">4층 / 남향 / 전용면적 59.8㎡</p>
+                    </div>
+                </div>
+                <button class="text-xs font-semibold text-brand-600 hover:bg-brand-50 px-3 py-1.5 rounded-xl border border-brand-200 transition-all">
+                    호실 변경
+                </button>
+            </div>
+
+            <!-- STEP 3 Form Inputs Card -->
+            <div class="bg-surface-card rounded-2xl p-8 border border-surface-border shadow-soft space-y-6">
+                
+                <div class="border-b border-slate-100 pb-4">
+                    <h3 class="text-base font-bold text-slate-900">3단계: 매물 조건 및 단가 입력</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">매물 상태, 임대 금액, 입주 가능일 등 필수 항목을 작성합니다.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Listing Type -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">매물 구조 유형 <span class="text-rose-500">*</span></label>
+                        <select class="w-full px-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none font-semibold text-slate-800">
+                            <option>투룸 (방2/욕1)</option>
+                            <option>원룸 (오픈형)</option>
+                            <option>1.5룸 (분리형)</option>
+                            <option>쓰리룸 / 아파트</option>
+                        </select>
+                    </div>
+
+                    <!-- Transaction Type -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">거래 방식 <span class="text-rose-500">*</span></label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" class="py-2.5 bg-brand-600 text-white rounded-xl text-xs font-bold shadow-sm">월세</button>
+                            <button type="button" class="py-2.5 bg-slate-100 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-200">전세</button>
+                            <button type="button" class="py-2.5 bg-slate-100 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-200">매매</button>
+                        </div>
+                    </div>
+
+                    <!-- Deposit Amount -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">보증금 (만 원) <span class="text-rose-500">*</span></label>
+                        <input type="number" value="3000" class="w-full px-4 py-2.5 text-xs font-mono font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none">
+                        <p class="text-[11px] text-brand-600 font-bold mt-1">💡 3,000만 원 (삼천만 원)</p>
+                    </div>
+
+                    <!-- Monthly Rent Amount -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">월세 (만 원) <span class="text-rose-500">*</span></label>
+                        <input type="number" value="80" class="w-full px-4 py-2.5 text-xs font-mono font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none">
+                        <p class="text-[11px] text-brand-600 font-bold mt-1">💡 80만 원 (팔십만 원)</p>
+                    </div>
+
+                    <!-- Maintenance Fee -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">관리비 (만 원)</label>
+                        <input type="number" value="10" class="w-full px-4 py-2.5 text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none">
+                    </div>
+
+                    <!-- Move-in Availability -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">입주 가능일 <span class="text-rose-500">*</span></label>
+                        <select class="w-full px-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none font-semibold text-slate-800">
+                            <option>즉시 입주 가능</option>
+                            <option>2026-03-15 (퇴실 예정)</option>
+                            <option>날짜 협의 필요</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- Additional Options Checkbox -->
+                <div class="pt-4 border-t border-slate-100 space-y-3">
+                    <label class="block text-xs font-bold text-slate-700">포함 옵션 (풀옵션 여부)</label>
+                    <div class="flex flex-wrap gap-4 text-xs font-medium text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" checked class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-slate-300">
+                            <span>에어컨</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" checked class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-slate-300">
+                            <span>세탁기</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" checked class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-slate-300">
+                            <span>냉장고</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" checked class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-slate-300">
+                            <span>인덕션/가스레인지</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-slate-300">
+                            <span>붙박이장</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-slate-300">
+                            <span>엘리베이터</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Internal Notes -->
+                <div class="pt-4 border-t border-slate-100">
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">내부 중개 특이사항 메모</label>
+                    <textarea rows="3" placeholder="예: 세입자 퇴실 시 입주 청소비 10만 원 약정됨, 도배 상태 양호..." class="w-full px-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none"></textarea>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>
