@@ -54,3 +54,23 @@ export const contracts = [
   { id: "C-000008", status: "잔금 예정", listing: "햇살하우스 201호", source: "이○○ · S-000025", contractDate: "2026.08.20", moveIn: "09.01 / 27.08.31", balance: "내일" },
   { id: "C-000007", status: "정식 계약", listing: "그린타운 101호", source: "박○○ · S-000021", contractDate: "2026.08.18", moveIn: "09.05 / 27.09.04", balance: "08.30" },
 ];
+
+export type InboxTask = {
+  id: string;
+  group: "지연됨" | "오늘" | "이번 주";
+  category: "상담" | "매물" | "퇴실" | "계약" | "확인";
+  title: string;
+  detail: string;
+  due: string;
+  href: string;
+};
+
+export const inboxTasks: InboxTask[] = [
+  { id: "task-1", group: "지연됨", category: "상담", title: "김○○에게 다음 연락", detail: "S-000024 · 투룸 500 / 55 · 전화 상담 후 재연락", due: "어제 14:00", href: "/consultations/S-000024" },
+  { id: "task-2", group: "지연됨", category: "매물", title: "대성빌 302호 상태 재확인", detail: "M-000042 · 마지막 매물 확인 8일 전", due: "8일 지연", href: "/listings" },
+  { id: "task-3", group: "오늘", category: "상담", title: "이○○ 방문 전 확인", detail: "S-000025 · 햇살하우스 201호 · 방문 예정", due: "16:00", href: "/consultations/S-000025" },
+  { id: "task-4", group: "오늘", category: "계약", title: "C-000008 잔금 전 확인", detail: "햇살하우스 201호 · 잔금 예정일 전 서류·입금 확인", due: "오늘", href: "/contracts" },
+  { id: "task-5", group: "오늘", category: "확인", title: "그린타운 202호 사진 보유 여부", detail: "M-000040 · 광고·제안 전 사진 확인 필요", due: "오늘", href: "/listings" },
+  { id: "task-6", group: "이번 주", category: "퇴실", title: "한솔빌 103호 퇴실 예정 확인", detail: "M-000037 · 퇴실 예정 08/29 · 다음 임차인 안내 전 확인", due: "08/29", href: "/listings" },
+  { id: "task-7", group: "이번 주", category: "계약", title: "그린타운 101호 입주일 확인", detail: "C-000007 · 입주일 09/05 · 입주 전 최종 확인", due: "09/03", href: "/contracts" },
+];
