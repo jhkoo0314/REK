@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f5f2;
-  --foreground: #292827;
+  --background: #faf8f4;
+  --foreground: #302b28;
 }
 
 * { box-sizing: border-box; }
@@ -15,3 +15,15 @@ body {
   color: var(--foreground);
   font-family: Arial, sans-serif;
 }
+
+/* 0-A 목업 화면의 기존 임시 색상도 아이보리·테라코타 체계로 통일한다. */
+.bg-\[\#3e3a37\] { background-color: #a85f43 !important; }
+.text-\[\#3e3a37\] { color: #a85f43 !important; }
+.border-\[\#3e3a37\] { border-color: #a85f43 !important; }
+.bg-\[\#eeeae3\] { background-color: #f3e4dc !important; }
+.text-\[\#292827\] { color: #302b28 !important; }
+.text-\[\#77736e\] { color: #7b7470 !important; }
+.border-\[\#e5e1db\] { border-color: #e8e1db !important; }
+.bg-\[\#faf9f7\] { background-color: #fdfaf8 !important; }
+.hover\:bg-\[\#faf8f4\]:hover { background-color: #fdf8f5 !important; }
+.focus\:border-\[\#aa9b8d\]:focus { border-color: #c78e75 !important; }

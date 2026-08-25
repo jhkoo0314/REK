@@ -18,11 +18,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen bg-[#f6f5f2] text-[#292827] lg:grid lg:grid-cols-[224px_1fr]">
-      <aside className="bg-[#292827] px-4 py-5 text-[#eceae6] lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:py-7">
+    <div className="min-h-screen bg-[#faf8f4] text-[#302b28] lg:grid lg:grid-cols-[224px_1fr]">
+      <aside className="border-r border-[#e2d9d1] bg-[#f1ede8] px-4 py-5 text-[#302b28] lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:py-7">
         <div className="flex items-center justify-between lg:block">
-          <Link className="text-base font-extrabold tracking-[-0.06em] text-white" href="/consultations">
-            <span className="mr-2 rounded bg-[#eeeae3] px-1.5 py-0.5 font-mono text-sm text-[#292827]">h</span>
+          <Link className="text-base font-extrabold tracking-[-0.06em] text-[#302b28]" href="/consultations">
+            <span className="mr-2 rounded bg-[#e8d1c5] px-1.5 py-0.5 font-mono text-sm text-[#8f4e36]">h</span>
             HOMEROOM
           </Link>
           <div className="lg:hidden"><UserButton /></div>
@@ -32,23 +32,23 @@ export function AppShell({ children }: { children: ReactNode }) {
             const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
             return (
               <Link
-                className={`whitespace-nowrap rounded-lg px-3 py-2.5 text-xs font-semibold transition ${active ? "bg-[#3e3a37] text-white" : "text-[#c7c3bd] hover:bg-[#3e3a37] hover:text-white"}`}
+                className={`whitespace-nowrap rounded-lg px-3 py-3 text-sm font-bold tracking-[-0.02em] transition ${active ? "bg-[#f3e4dc] text-[#8f4e36]" : "text-[#655d59] hover:bg-[#eae3dc] hover:text-[#302b28]"}`}
                 href={item.href}
                 key={item.href}
               >
-                {active && <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-[#e6c8a8]" />}
+                {active && <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-[#a85f43]" />}
                 {item.label}
               </Link>
             );
           })}
         </nav>
-        <div className="mt-auto hidden border-t border-[#484541] px-3 pt-5 text-xs text-[#c7c3bd] lg:block">
+        <div className="mt-auto hidden border-t border-[#e2d9d1] px-3 pt-5 text-xs text-[#7b7470] lg:block">
           <UserButton showName />
         </div>
       </aside>
       <div className="min-w-0 px-4 pb-10 lg:px-9">
-        <header className="flex h-16 items-center justify-between border-b border-[#e5e1db]">
-          <span className="font-mono text-[10px] tracking-wide text-[#77736e]">WORKSPACE / DEVELOPMENT</span>
+        <header className="flex h-16 items-center justify-between border-b border-[#e8e1db]">
+          <span className="font-mono text-[10px] tracking-wide text-[#7b7470]">WORKSPACE / DEVELOPMENT</span>
           <div className="hidden lg:block"><UserButton /></div>
         </header>
         {children}
