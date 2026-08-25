@@ -4,7 +4,13 @@
 
 ## 현재 단계
 
-재빌드 준비가 끝났으며, 다음 단계는 **0단계: 새 Next.js 기반과 Clerk 로그인·공통 화면 만들기**입니다. 실제 구현 상태는 `docs/CURRENT_IMPLEMENTATION_STATUS.md`에서 확인합니다.
+0단계의 Next.js 기반·Clerk 로그인·공통 화면을 구현했고, 현재는 가공 목업 데이터로 전체 디자인과 화면 흐름을 검토하는 **0-A 디자인 검증 단계**를 진행 중입니다. 실제 DB 연결과 저장 기능은 아직 없습니다. 실제 구현 상태는 `docs/CURRENT_IMPLEMENTATION_STATUS.md`에서 확인합니다.
+
+## 개발 실행
+
+1. `.env.local`에 이미 준비된 Clerk Development 설정을 유지합니다. 값은 Git·화면·로그에 표시하지 않습니다.
+2. `npm run dev`를 실행한 뒤 브라우저에서 `http://localhost:3000`을 엽니다.
+3. 로그인하면 상담 관리(`/consultations`)로 이동합니다.
 
 ## 문서 사용 순서
 

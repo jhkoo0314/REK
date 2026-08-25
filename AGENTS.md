@@ -240,3 +240,13 @@ Production 배포 전에는 다음을 모두 통과해야 한다.
 - [ ] Production 환경 변수·도메인·Clerk 리다이렉트 URL을 확인했다.
 - [ ] 실제 업무 데이터는 웹서비스에서 새로 등록하는 방식이 준비됐다.
 - [ ] `production_release_checklist_v1.md`의 최종 체크를 완료했다.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
