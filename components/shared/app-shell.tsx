@@ -1,6 +1,6 @@
 "use client";
 
-import { UserButton } from "@clerk/nextjs";
+import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -25,7 +25,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="mr-2 rounded bg-[#e8d1c5] px-1.5 py-0.5 font-mono text-sm text-[#8f4e36]">h</span>
             HOMEROOM
           </Link>
-          <div className="lg:hidden"><UserButton /></div>
+          <div className="flex items-center gap-2 lg:hidden"><OrganizationSwitcher afterSelectOrganizationUrl="/consultations" hidePersonal /><UserButton /></div>
         </div>
         <nav className="mt-5 flex gap-1 overflow-x-auto lg:mt-8 lg:grid">
           {navigation.map((item) => {
@@ -49,7 +49,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="min-w-0 px-4 pb-10 lg:px-9">
         <header className="flex h-16 items-center justify-between border-b border-[#e8e1db]">
           <span className="font-mono text-[10px] tracking-wide text-[#7b7470]">WORKSPACE / DEVELOPMENT</span>
-          <div className="hidden lg:block"><UserButton /></div>
+          <div className="hidden items-center gap-3 lg:flex"><OrganizationSwitcher afterSelectOrganizationUrl="/consultations" hidePersonal /><UserButton /></div>
         </header>
         {children}
       </div>

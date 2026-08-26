@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+.field { @apply mt-1.5 h-10 w-full rounded-lg border border-[#e5e1db] bg-white px-3 text-sm text-[#302b28] outline-none placeholder:text-[#9a938c] focus:border-[#aa9b8d]; }
+.label { @apply block text-xs font-bold text-[#655f59]; }
+
 :root {
   --background: #faf8f4;
   --foreground: #302b28;
