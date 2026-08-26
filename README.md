@@ -10,7 +10,7 @@ P0 매물 관리와 P1 상담·계약·오늘 할 일의 실제 Dev DB 저장 �
 
 1. `.env.local`에 이미 준비된 Clerk Development 설정을 유지합니다. 값은 Git·화면·로그에 표시하지 않습니다.
 2. `npm run dev`를 실행한 뒤 브라우저에서 `http://localhost:3000`을 엽니다.
-3. 로그인하면 상담 관리(`/consultations`)로 이동합니다.
+3. 로그인하면 중요업무알림(`/dashboard`)으로 이동합니다.
 
 ## 문서 사용 순서
 

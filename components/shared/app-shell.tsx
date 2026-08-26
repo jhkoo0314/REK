@@ -21,11 +21,11 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-[#faf8f4] text-[#302b28] lg:grid lg:grid-cols-[224px_1fr]">
       <aside className="border-r border-[#e2d9d1] bg-[#f1ede8] px-4 py-5 text-[#302b28] lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:py-7">
         <div className="flex items-center justify-between lg:block">
-          <Link className="text-base font-extrabold tracking-[-0.06em] text-[#302b28]" href="/consultations">
+          <Link className="text-base font-extrabold tracking-[-0.06em] text-[#302b28]" href="/dashboard">
             <span className="mr-2 rounded bg-[#e8d1c5] px-1.5 py-0.5 font-mono text-sm text-[#8f4e36]">h</span>
             HOMEROOM
           </Link>
-          <div className="flex items-center gap-2 lg:hidden"><OrganizationSwitcher afterSelectOrganizationUrl="/consultations" hidePersonal /><UserButton /></div>
+          <div className="flex items-center gap-2 lg:hidden"><OrganizationSwitcher afterSelectOrganizationUrl="/dashboard" hidePersonal /><UserButton /></div>
         </div>
         <nav className="mt-5 flex gap-1 overflow-x-auto lg:mt-8 lg:grid">
           {navigation.map((item) => {
@@ -49,7 +49,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="min-w-0 px-4 pb-10 lg:px-9">
         <header className="flex h-16 items-center justify-between border-b border-[#e8e1db]">
           <span className="font-mono text-[10px] tracking-wide text-[#7b7470]">WORKSPACE / DEVELOPMENT</span>
-          <div className="hidden items-center gap-3 lg:flex"><OrganizationSwitcher afterSelectOrganizationUrl="/consultations" hidePersonal /><UserButton /></div>
+          <div className="hidden items-center gap-3 lg:flex"><OrganizationSwitcher afterSelectOrganizationUrl="/dashboard" hidePersonal /><UserButton /></div>
         </header>
         {children}
       </div>

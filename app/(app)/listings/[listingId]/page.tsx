@@ -2,9 +2,13 @@ import { PageHeader } from "@/components/shared/page-header";
 import { ListingDetailState } from "@/features/listings/components/listing-detail-state";
 import { ListingDetailView } from "@/features/listings/components/listing-detail-view";
 import { getListingDetail } from "@/features/listings/server/listing-queries";
+import { PropertyTypePreviewDetail } from "@/features/property-types/components/property-type-preview-detail";
+import { getPropertyPreview } from "@/features/property-types/mock-data";
 
 export default async function ListingDetailPage({ params }: { params: Promise<{ listingId: string }> }) {
   const { listingId } = await params;
+  const preview = getPropertyPreview(listingId);
+  if (preview) return <><PageHeader title={`${preview.typeLabel} 매물 상세`} description="가공 매물입니다. 실제 Dev DB에는 저장되지 않습니다." /><PropertyTypePreviewDetail item={preview} basePath="/listings" /></>;
   const header = <PageHeader title="매물 상세" description="현재 조건을 확인하고 필요한 경우 수정합니다." />;
   let result: Awaited<ReturnType<typeof getListingDetail>> | null = null;
   let errorMessage: string | undefined;
