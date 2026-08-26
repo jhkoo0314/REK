@@ -1,0 +1,5 @@
+"use client";
+import { deleteContract } from "@/features/contracts/server/contract-registration";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+export function ContractDeleteButton({ contractId, activityCount, status = "" }: { contractId: string; activityCount: number; status?: string }) { const router = useRouter(); const [busy, setBusy] = useState(false); const [message, setMessage] = useState(""); const willVacate = status === "in_progress" || status === "balance_due"; async function remove() { if (!window.confirm(`계약과 단계 이력 ${activityCount}건만 삭제합니다. 연결된 매물·상담 원본은 삭제되지 않습니다.${willVacate ? " 현재 계약 진행 매물은 공실로 되돌립니다." : " 계약 완료 과거 매물은 다시 공실로 열지 않습니다."} 계속할까요?`)) return; setBusy(true); const result = await deleteContract(contractId); if (!result.ok) { setMessage(result.message); setBusy(false); return; } router.push("/contracts"); } return <div><button disabled={busy} type="button" onClick={remove} className="rounded-lg border border-[#d8a59c] px-3 py-2 text-xs font-bold text-[#a84438]">{busy ? "삭제 중…" : "계약 삭제"}</button>{message && <p className="mt-2 text-xs text-[#b94a42]">{message}</p>}</div>; }

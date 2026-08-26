@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 const navigation = [
+  { href: "/dashboard", label: "중요업무알림" },
   { href: "/consultations", label: "상담 관리" },
-  { href: "/dashboard", label: "오늘 예정 업무" },
   { href: "/listings", label: "매물 관리" },
   { href: "/buildings", label: "건물·호실" },
   { href: "/contracts", label: "계약 관리" },
