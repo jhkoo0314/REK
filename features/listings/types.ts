@@ -1,5 +1,5 @@
 export type ListingStatus = "vacant" | "contract_in_progress" | "contract_complete" | "on_hold" | "ended";
-export type TransactionType = "monthly_rent" | "jeonse" | "to_be_confirmed";
+export type TransactionType = "monthly_rent" | "jeonse" | "sale" | "to_be_confirmed";
 export type PhotoStatus = "not_available" | "available" | "needs_confirmation";
 export type AvailabilityType = "immediate" | "date_specified" | "needs_confirmation";
 export type ListingEndReason = "other_broker_contract" | "other";

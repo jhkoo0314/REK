@@ -2,7 +2,7 @@
 
 import { consultationCreateSchema, type ConsultationCreateInput } from "@/features/consultations/schemas/consultation-create";
 import { consultationFollowupDeleteSchema, consultationFollowupSchema, consultationFollowupUpdateSchema, type ConsultationFollowupInput, type ConsultationFollowupUpdateInput } from "@/features/consultations/schemas/consultation-followup";
-import { consultationDeleteSchema, consultationUpdateSchema, type ConsultationUpdateInput } from "@/features/consultations/schemas/consultation-edit";
+import { consultationDeleteSchema, consultationInitialListingSchema, consultationUpdateSchema, type ConsultationUpdateInput } from "@/features/consultations/schemas/consultation-edit";
 import { getOrganizationContext } from "@/lib/auth/organization-context";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
@@ -11,6 +11,16 @@ export type ConsultationListingOption = { id: string; label: string };
 export type ConsultationRegistrationOptions = { context: Awaited<ReturnType<typeof getOrganizationContext>>; listings: ConsultationListingOption[] };
 export type ConsultationRegistrationResult = { ok: true; consultationId: string } | { ok: false; message: string; fieldErrors?: Record<string, string[]> };
 export type ConsultationFollowupResult = { ok: true } | { ok: false; message: string; fieldErrors?: Record<string, string[]> };
+
+function consultationSaveErrorMessage(error: { code?: string; message?: string } | null) {
+  const message = error?.message ?? "";
+  if (error?.code === "23502" && message.includes("customer_name")) return "고객 이름을 비워 저장하려면 20260826001200 migration을 먼저 적용해 주세요.";
+  if (error?.code === "42703" && message.includes("consultation_reference_number")) return "상담번호를 추가하는 20260826001400 migration을 먼저 적용해 주세요.";
+  if (error?.code === "23505" && message.includes("reference_number")) return "상담번호가 중복되었습니다. 20260826001400 migration 파일 전체를 다시 실행해 번호 순서를 정리해 주세요.";
+  if (error?.code === "42P01") return "상담 테이블이 없습니다. 20260826001100 migration 적용 여부를 확인해 주세요.";
+  if (error?.code || message) return `상담 저장 오류 (${error?.code ?? "원인 코드 없음"}): ${message || "DB가 상세 내용을 반환하지 않았습니다."}`;
+  return "상담을 저장하지 못했습니다. Dev DB의 P1 상담 migration 적용 상태를 확인해 주세요.";
+}
 export type StoredConsultationDetail = {
   id: string; customerName: string; customerPhone: string; category: "general" | "listing"; consultationDate: string; inflowSource: string; consultationMethod: string; consultationNote: string | null;
   desiredAreas: string[]; desiredAreasOther: string | null; desiredRoomTypes: string[]; desiredRoomTypesOther: string | null; desiredDepositBudget: number | null; desiredMonthlyRentBudget: number | null; desiredMoveInDate: string | null; requiredFeaturesNote: string | null;
@@ -19,7 +29,7 @@ export type StoredConsultationDetail = {
 };
 export type StoredConsultationFollowup = { id: string; followupDate: string; followupMethod: string; progressStage: string | null; visitResult: string | null; closedReason: string | null; nextContactDate: string | null; note: string | null };
 export type ConsultationListItem = {
-  id: string; referenceNumber: number | null; customerName: string; customerPhone: string; category: "general" | "listing"; inflowSource: string; consultationDate: string; status: string; progressStage: string; nextContactDate: string | null; closedReason: string | null; initialListingLabel: string | null;
+  id: string; referenceNumber: number | null; customerName: string; customerPhone: string; category: "general" | "listing"; inflowSource: string; consultationDate: string; status: string; progressStage: string; nextContactDate: string | null; closedReason: string | null; initialListingLabel: string | null; latestFollowupDate: string | null; latestFollowupMethod: string | null;
   desiredAreas: string[]; desiredAreasOther: string | null; desiredRoomTypes: string[]; desiredRoomTypesOther: string | null; desiredDepositBudget: number | null; desiredMonthlyRentBudget: number | null;
 };
 
@@ -76,7 +86,7 @@ export async function getConsultationList(): Promise<{ context: Awaited<ReturnTy
   const context = await getOrganizationContext();
   if (context.kind !== "ready") return { context, consultations: [] };
   const supabase = createSupabaseServerClient();
-  const { data, error } = await supabase.from("consultations").select("id, consultation_reference_number, initial_listing_id, customer_name, customer_phone, category, inflow_source, consultation_date, status, progress_stage, next_contact_date, closed_reason, desired_areas, desired_areas_other, desired_room_types, desired_room_types_other, desired_deposit_budget, desired_monthly_rent_budget").eq("organization_id", context.organizationId).order("consultation_date", { ascending: false }).order("created_at", { ascending: false });
+  const { data, error } = await supabase.from("consultations").select("id, consultation_reference_number, initial_listing_id, customer_name, customer_phone, category, inflow_source, consultation_date, status, progress_stage, next_contact_date, closed_reason, latest_followup_date, latest_followup_method, desired_areas, desired_areas_other, desired_room_types, desired_room_types_other, desired_deposit_budget, desired_monthly_rent_budget").eq("organization_id", context.organizationId).order("consultation_date", { ascending: false }).order("created_at", { ascending: false });
   if (error) throw new Error("상담 목록을 불러오지 못했습니다. Dev DB의 P1 상담 migration 적용 상태를 확인해 주세요.");
   const listingIds = (data ?? []).map((item) => item.initial_listing_id).filter((item): item is string => Boolean(item));
   const { data: initialListings, error: listingError } = listingIds.length === 0 ? { data: [], error: null } : await supabase.from("listings").select("id, listing_reference_number, units!inner(unit_number, buildings!inner(name))").eq("organization_id", context.organizationId).in("id", listingIds);
@@ -87,7 +97,7 @@ export async function getConsultationList(): Promise<{ context: Awaited<ReturnTy
     return [listing.id, `M-${String(listing.listing_reference_number ?? "").padStart(6, "0")} · ${building?.name ?? "건물"} ${unit?.unit_number ?? "호실"}`];
   }));
   return { context, consultations: (data ?? []).map((item) => ({
-    id: item.id, referenceNumber: item.consultation_reference_number, customerName: item.customer_name ?? "이름 미입력", customerPhone: item.customer_phone, category: item.category, inflowSource: item.inflow_source, consultationDate: item.consultation_date, status: item.status, progressStage: item.progress_stage, nextContactDate: item.next_contact_date, closedReason: item.closed_reason, initialListingLabel: item.initial_listing_id ? listingLabelById.get(item.initial_listing_id) ?? "연결 매물 확인 필요" : null,
+    id: item.id, referenceNumber: item.consultation_reference_number, customerName: item.customer_name ?? "이름 미입력", customerPhone: item.customer_phone, category: item.category, inflowSource: item.inflow_source, consultationDate: item.consultation_date, status: item.status, progressStage: item.progress_stage, nextContactDate: item.next_contact_date, closedReason: item.closed_reason, initialListingLabel: item.initial_listing_id ? listingLabelById.get(item.initial_listing_id) ?? "연결 매물 확인 필요" : null, latestFollowupDate: item.latest_followup_date, latestFollowupMethod: item.latest_followup_method,
     desiredAreas: item.desired_areas ?? [], desiredAreasOther: item.desired_areas_other, desiredRoomTypes: item.desired_room_types ?? [], desiredRoomTypesOther: item.desired_room_types_other, desiredDepositBudget: item.desired_deposit_budget, desiredMonthlyRentBudget: item.desired_monthly_rent_budget,
   })) };
 }
@@ -131,7 +141,7 @@ export async function createConsultation(values: ConsultationCreateInput): Promi
     created_by_clerk_user_id: context.clerkUserId,
     updated_by_clerk_user_id: context.clerkUserId,
   }).select("id").single();
-  if (error || !data) return { ok: false, message: "상담을 저장하지 못했습니다. Dev DB에 P1 상담 migration이 적용되었는지 확인해 주세요." };
+  if (error || !data) return { ok: false, message: consultationSaveErrorMessage(error) };
 
   revalidatePath("/consultations");
   revalidatePath("/dashboard");
@@ -231,6 +241,20 @@ export async function updateConsultation(values: ConsultationUpdateInput): Promi
   const { data, error } = await supabase.from("consultations").update(consultationPayload(value, context.organizationId, context.clerkUserId)).eq("id", value.id).eq("organization_id", context.organizationId).select("id").maybeSingle();
   if (error || !data) return { ok: false, message: "상담 기본 정보를 저장하지 못했습니다." };
   revalidatePath("/consultations"); revalidatePath(`/consultations/${value.id}`); revalidatePath("/dashboard");
+  return { ok: true };
+}
+
+export async function connectConsultationInitialListing(values: { consultationId: string; listingId: string }): Promise<ConsultationFollowupResult> {
+  const parsed = consultationInitialListingSchema.safeParse(values);
+  if (!parsed.success) return { ok: false, message: "연결할 상담과 매물을 확인해 주세요." };
+  const context = await getOrganizationContext();
+  if (context.kind !== "ready") return { ok: false, message: "활성 조직 멤버십을 확인할 수 없습니다." };
+  const supabase = createSupabaseServerClient();
+  const { data: listing } = await supabase.from("listings").select("id").eq("id", parsed.data.listingId).eq("organization_id", context.organizationId).eq("is_current", true).maybeSingle();
+  if (!listing) return { ok: false, message: "현재 조직의 관리 중 매물만 연결할 수 있습니다." };
+  const { data, error } = await supabase.from("consultations").update({ category: "listing", initial_listing_id: parsed.data.listingId, updated_by_clerk_user_id: context.clerkUserId }).eq("id", parsed.data.consultationId).eq("organization_id", context.organizationId).select("id").maybeSingle();
+  if (error || !data) return { ok: false, message: "최초 문의 매물을 연결하지 못했습니다." };
+  revalidatePath("/consultations"); revalidatePath(`/consultations/${parsed.data.consultationId}`);
   return { ok: true };
 }
 

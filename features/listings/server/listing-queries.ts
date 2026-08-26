@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AvailabilityType, ListingDetail, ListingEditData, ListingFilters, ListingListItem, ListingStatus, PhotoStatus, TransactionType } from "@/features/listings/types";
 
 const listingStatuses = ["vacant", "contract_in_progress", "contract_complete", "on_hold", "ended"] as const;
-const transactionTypes = ["monthly_rent", "jeonse", "to_be_confirmed"] as const;
+const transactionTypes = ["monthly_rent", "jeonse", "sale", "to_be_confirmed"] as const;
 const photoStatuses = ["not_available", "available", "needs_confirmation"] as const;
 
 type SearchValue = string | string[] | undefined;

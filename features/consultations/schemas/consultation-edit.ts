@@ -17,4 +17,5 @@ export const consultationUpdateSchema = z.object({
 });
 
 export const consultationDeleteSchema = z.object({ id: z.string().uuid() });
+export const consultationInitialListingSchema = z.object({ consultationId: z.string().uuid(), listingId: z.string().uuid() });
 export type ConsultationUpdateInput = z.input<typeof consultationUpdateSchema>;

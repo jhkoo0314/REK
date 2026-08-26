@@ -11,7 +11,7 @@ create type public.member_role as enum ('admin', 'staff');
 create type public.member_status as enum ('active', 'inactive');
 create type public.property_type as enum ('one_room', 'two_room', 'apartment', 'officetel', 'retail', 'office');
 create type public.listing_status as enum ('vacant', 'contract_in_progress', 'contract_complete', 'on_hold', 'ended');
-create type public.transaction_type as enum ('monthly_rent', 'jeonse', 'to_be_confirmed');
+create type public.transaction_type as enum ('monthly_rent', 'jeonse', 'sale', 'to_be_confirmed');
 create type public.photo_status as enum ('not_available', 'available', 'needs_confirmation');
 create type public.field_status as enum ('not_checked', 'checked', 'needs_recheck');
 create type public.contact_role as enum ('owner', 'manager', 'caretaker', 'tenant', 'other');
@@ -149,7 +149,8 @@ create table public.listings (
     references public.units(id, organization_id) on delete restrict,
   check (listing_status <> 'ended' or is_current = false),
   check (transaction_type <> 'monthly_rent' or monthly_rent_amount is not null),
-  check (transaction_type <> 'jeonse' or (deposit_amount is not null and coalesce(monthly_rent_amount, 0) = 0))
+  check (transaction_type <> 'jeonse' or (deposit_amount is not null and coalesce(monthly_rent_amount, 0) = 0)),
+  check (transaction_type <> 'sale' or (deposit_amount is not null and coalesce(monthly_rent_amount, 0) = 0))
 );
 
 create unique index listings_one_current_per_unit_idx

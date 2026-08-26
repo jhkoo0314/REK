@@ -21,10 +21,16 @@ alter table public.consultations
 
 do $$
 begin
-  alter table public.consultations
-    add constraint consultations_organization_reference_number_key
-    unique (organization_id, consultation_reference_number);
-exception when duplicate_object then null;
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'consultations_organization_reference_number_key'
+      and conrelid = 'public.consultations'::regclass
+  ) then
+    alter table public.consultations
+      add constraint consultations_organization_reference_number_key
+      unique (organization_id, consultation_reference_number);
+  end if;
 end $$;
 
 select setval(
@@ -37,3 +43,8 @@ create index if not exists consultations_organization_reference_number_idx
   on public.consultations (organization_id, consultation_reference_number desc);
 
 comment on column public.consultations.consultation_reference_number is 'Human-friendly internal consultation number, rendered as S-000001.';
+
+-- Dev-only: this sequence was created after the earlier P0 grant migration.
+-- The web server uses the publishable client in Dev, so it needs sequence use.
+grant usage, select on sequence public.consultation_reference_number_seq
+to anon, authenticated;

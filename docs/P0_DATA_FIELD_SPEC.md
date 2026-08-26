@@ -132,8 +132,8 @@
 | `listing_status` | enum | 예 | 아래 상태값 사용 |
 | `is_current` | boolean | 예 | 현재 관리 매물인지 표시. 호실당 `true` 한 건만 허용. 사용자가 계약 완료를 확인하면 `false`로 바꾸어 과거 이력으로 남김 |
 | `end_reason` | enum | 조건부 | 계약 외 관리 종료일 때 `other_broker_contract`(타 부동산 계약) 또는 `other`(기타)를 기록. `20260826001000` 수동 적용 뒤 사용 |
-| `transaction_type` | enum | 예 | `monthly_rent`, `jeonse`, `to_be_confirmed` |
-| `deposit_amount` | integer | 아니오 | 보증금, 만원 단위, 0 이상 |
+| `transaction_type` | enum | 예 | `monthly_rent`, `jeonse`, `sale`, `to_be_confirmed` |
+| `deposit_amount` | integer | 아니오 | 보증금 또는 매매가, 만원 단위, 0 이상 |
 | `monthly_rent_amount` | integer | 아니오 | 월세, 만원 단위, 0 이상 |
 | `maintenance_fee_amount` | integer | 아니오 | 관리비, 만원 단위, 0 이상 |
 | `availability_type` | enum | 예 | `immediate`, `date_specified`, `needs_confirmation` |
@@ -154,6 +154,7 @@
 | P0 입력 방 구조 | `one_room`, `two_room`, `two_bay`, `three_room`, `owner_unit` 선택 가능. 아파트·오피스텔·상가·사무실은 DB 확장 예약값이며 현재 화면에는 표시하지 않음 |
 | 월세 | `monthly_rent`일 때 입력 가능. 전세일 때는 비움 또는 0 |
 | 전세 | `jeonse`일 때 보증금 입력. 월세는 비움 또는 0 |
+| 매매 | `sale`일 때 `deposit_amount` 칸에 매매가를 입력. 월세는 비움 또는 0 |
 | 입주 가능 조건 | `immediate`는 즉시 가능, `date_specified`는 입주 가능일 필수, `needs_confirmation`은 날짜 없음 |
 | 현재 매물 | 같은 호실에 `is_current = true`인 매물은 한 건만 허용. 계약 완료 확정 시 `listing_status = contract_complete`, `is_current = false`로 종료해 새 현재 매물을 등록할 수 있게 함 |
 | 일반 수정 | 가격·상태·입주 가능일·재확인일 변경은 같은 현재 매물 행을 수정. 새 매물을 자동 생성하지 않음 |
