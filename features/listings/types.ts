@@ -2,6 +2,7 @@ export type ListingStatus = "vacant" | "contract_in_progress" | "contract_comple
 export type TransactionType = "monthly_rent" | "jeonse" | "to_be_confirmed";
 export type PhotoStatus = "not_available" | "available" | "needs_confirmation";
 export type AvailabilityType = "immediate" | "date_specified" | "needs_confirmation";
+export type ListingEndReason = "other_broker_contract" | "other";
 
 export type ListingListItem = {
   id: string;
@@ -45,6 +46,7 @@ export type ListingDetail = ListingListItem & {
   direction: string | null;
   options: string[];
   moveOutDate: string | null;
+  endReason: ListingEndReason | null;
 };
 
 export type ListingEditData = { listing: ListingDetail; accessPassword: string; ownerPhone: string; tenantPhone: string };

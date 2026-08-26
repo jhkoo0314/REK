@@ -90,17 +90,17 @@ export async function getListingList(searchParams: SearchParams) {
   return { context, filters, listings };
 }
 
-export async function getListingDetail(listingId: string) {
+async function getListingDetailByCurrentState(listingId: string, isCurrent: boolean) {
   const context = await getOrganizationContext();
   if (context.kind !== "ready") return { context, listing: null as ListingDetail | null };
 
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase
     .from("listings")
-    .select("id, listing_reference_number, property_type, listing_status, transaction_type, deposit_amount, monthly_rent_amount, maintenance_fee_amount, availability_type, available_date, move_out_date, holding_source, photo_status, last_confirmed_date, units!inner(id, unit_number, layout_type, floor, direction, options, buildings!inner(id, name, road_address, lot_address, address_detail))")
+    .select("id, listing_reference_number, property_type, listing_status, transaction_type, deposit_amount, monthly_rent_amount, maintenance_fee_amount, availability_type, available_date, move_out_date, end_reason, holding_source, photo_status, last_confirmed_date, units!inner(id, unit_number, layout_type, floor, direction, options, buildings!inner(id, name, road_address, lot_address, address_detail))")
     .eq("id", listingId)
     .eq("organization_id", context.organizationId)
-    .eq("is_current", true)
+    .eq("is_current", isCurrent)
     .maybeSingle();
 
   if (error) throw new Error("매물 상세를 불러오지 못했습니다.");
@@ -137,8 +137,17 @@ export async function getListingDetail(listingId: string) {
       direction: unit?.direction ?? null,
       options: unit?.options ?? [],
       moveOutDate: data.move_out_date,
+      endReason: data.end_reason,
     } satisfies ListingDetail,
   };
+}
+
+export async function getListingDetail(listingId: string) {
+  return getListingDetailByCurrentState(listingId, true);
+}
+
+export async function getListingHistoryDetail(listingId: string) {
+  return getListingDetailByCurrentState(listingId, false);
 }
 
 export async function getListingEditData(listingId: string) {

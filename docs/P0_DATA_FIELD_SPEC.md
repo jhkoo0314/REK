@@ -130,7 +130,8 @@
 | `listing_reference_number` | integer | 예 | 조직 안에서 한 번만 쓰는 표시용 번호. 화면에서는 `M-000001`처럼 표시 |
 | `property_type` | enum | 예 | 등록 화면의 방 구조. `one_room`, `two_room`, `two_bay`, `three_room`, `owner_unit`, `apartment`, `officetel`, `retail`, `office` |
 | `listing_status` | enum | 예 | 아래 상태값 사용 |
-| `is_current` | boolean | 예 | 현재 관리 매물인지 표시. 호실당 `true` 한 건만 허용 |
+| `is_current` | boolean | 예 | 현재 관리 매물인지 표시. 호실당 `true` 한 건만 허용. 사용자가 계약 완료를 확인하면 `false`로 바꾸어 과거 이력으로 남김 |
+| `end_reason` | enum | 조건부 | 계약 외 관리 종료일 때 `other_broker_contract`(타 부동산 계약) 또는 `other`(기타)를 기록. `20260826001000` 수동 적용 뒤 사용 |
 | `transaction_type` | enum | 예 | `monthly_rent`, `jeonse`, `to_be_confirmed` |
 | `deposit_amount` | integer | 아니오 | 보증금, 만원 단위, 0 이상 |
 | `monthly_rent_amount` | integer | 아니오 | 월세, 만원 단위, 0 이상 |
@@ -154,9 +155,10 @@
 | 월세 | `monthly_rent`일 때 입력 가능. 전세일 때는 비움 또는 0 |
 | 전세 | `jeonse`일 때 보증금 입력. 월세는 비움 또는 0 |
 | 입주 가능 조건 | `immediate`는 즉시 가능, `date_specified`는 입주 가능일 필수, `needs_confirmation`은 날짜 없음 |
-| 현재 매물 | 같은 호실에 `is_current = true`인 매물은 한 건만 허용 |
+| 현재 매물 | 같은 호실에 `is_current = true`인 매물은 한 건만 허용. 계약 완료 확정 시 `listing_status = contract_complete`, `is_current = false`로 종료해 새 현재 매물을 등록할 수 있게 함 |
 | 일반 수정 | 가격·상태·입주 가능일·재확인일 변경은 같은 현재 매물 행을 수정. 새 매물을 자동 생성하지 않음 |
 | 이력 | 종료 뒤 새 현재 매물이 필요할 때만 사용자가 명시적으로 과거 매물을 종료하고 새 매물을 만든다 |
+| 관리 종료 | 계약 성사가 아닌 종료는 사용자가 `타 부동산 계약` 또는 `기타` 사유를 선택한 뒤 `listing_status = ended`, `is_current = false`로 전환 |
 
 ## 7. 공통 항목과 종류별 항목의 경계
 

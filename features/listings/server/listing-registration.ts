@@ -6,6 +6,7 @@ import { normalizeForMatch, normalizeUnitNumber } from "@/lib/text-normalize";
 import { listingCreateSchema, type ListingCreateInput } from "@/features/listings/schemas/listing-create";
 import { listingUpdateSchema, type ListingUpdateInput } from "@/features/listings/schemas/listing-update";
 import { listingQuickUpdateSchema, type ListingQuickUpdateInput } from "@/features/listings/schemas/listing-quick-update";
+import { listingRetireSchema, type ListingRetireInput } from "@/features/listings/schemas/listing-retire";
 import { revalidatePath } from "next/cache";
 
 type BuildingOption = { id: string; name: string; address: string };
@@ -141,11 +142,24 @@ export async function createListing(values: ListingCreateInput): Promise<Listing
   return { ok: true, listingReferenceNumber: created.listing_reference_number };
 }
 
-export type ListingUpdateResult = { ok: true } | { ok: false; message: string; fieldErrors?: Record<string, string[]> };
+export type ListingUpdateResult = { ok: true; movedToHistory: boolean } | { ok: false; message: string; fieldErrors?: Record<string, string[]> };
 
 export type ListingAccessPasswordResult = { ok: true; password: string } | { ok: false; message: string };
 
-export type ListingQuickUpdateResult = { ok: true } | { ok: false; message: string };
+export type ListingQuickUpdateResult = { ok: true; movedToHistory: boolean } | { ok: false; message: string };
+export type ListingRetireResult = { ok: true } | { ok: false; message: string };
+
+export async function retireListing(values: ListingRetireInput): Promise<ListingRetireResult> {
+  const parsed = listingRetireSchema.safeParse(values);
+  if (!parsed.success) return { ok: false, message: "매물 정보를 확인해 주세요." };
+  const context = await getOrganizationContext();
+  if (context.kind !== "ready") return { ok: false, message: "활성 조직 멤버십을 확인할 수 없습니다." };
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase.from("listings").update({ listing_status: "ended", is_current: false, end_reason: parsed.data.endReason, updated_by_clerk_user_id: context.clerkUserId }).eq("id", parsed.data.id).eq("organization_id", context.organizationId).eq("is_current", true).select("id").maybeSingle();
+  if (error || !data) return { ok: false, message: "종료할 현재 매물을 찾지 못했거나 저장에 실패했습니다." };
+  revalidatePath("/listings"); revalidatePath("/buildings"); revalidatePath(`/listings/${parsed.data.id}`); revalidatePath(`/listings/${parsed.data.id}/history`);
+  return { ok: true };
+}
 
 export async function quickUpdateListing(values: ListingQuickUpdateInput): Promise<ListingQuickUpdateResult> {
   const parsed = listingQuickUpdateSchema.safeParse(values);
@@ -156,7 +170,7 @@ export async function quickUpdateListing(values: ListingQuickUpdateInput): Promi
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase
     .from("listings")
-    .update({ listing_status: value.listingStatus, photo_status: value.photoStatus, last_confirmed_date: value.lastConfirmedDate || null, holding_source: value.holdingSource || null, updated_by_clerk_user_id: context.clerkUserId })
+    .update({ listing_status: value.listingStatus, is_current: value.listingStatus !== "contract_complete", photo_status: value.photoStatus, last_confirmed_date: value.lastConfirmedDate || null, holding_source: value.holdingSource || null, updated_by_clerk_user_id: context.clerkUserId })
     .eq("id", value.id)
     .eq("organization_id", context.organizationId)
     .eq("is_current", true)
@@ -166,7 +180,9 @@ export async function quickUpdateListing(values: ListingQuickUpdateInput): Promi
   revalidatePath("/listings");
   revalidatePath(`/listings/${value.id}`);
   revalidatePath(`/listings/${value.id}/edit`);
-  return { ok: true };
+  revalidatePath(`/listings/${value.id}/history`);
+  revalidatePath("/buildings");
+  return { ok: true, movedToHistory: value.listingStatus === "contract_complete" };
 }
 
 export async function getListingAccessPassword(listingId: string): Promise<ListingAccessPasswordResult> {
@@ -208,6 +224,7 @@ export async function updateListing(values: ListingUpdateInput): Promise<Listing
     .update({
       property_type: value.propertyType,
       listing_status: value.listingStatus,
+      is_current: value.listingStatus !== "contract_complete",
       transaction_type: value.transactionType,
       deposit_amount: value.depositAmount ? Number(value.depositAmount) : null,
       monthly_rent_amount: value.monthlyRentAmount ? Number(value.monthlyRentAmount) : null,
@@ -246,5 +263,7 @@ export async function updateListing(values: ListingUpdateInput): Promise<Listing
   revalidatePath("/listings");
   revalidatePath(`/listings/${value.id}`);
   revalidatePath(`/listings/${value.id}/edit`);
-  return { ok: true };
+  revalidatePath(`/listings/${value.id}/history`);
+  revalidatePath("/buildings");
+  return { ok: true, movedToHistory: value.listingStatus === "contract_complete" };
 }

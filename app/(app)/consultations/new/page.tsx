@@ -1,9 +1,11 @@
 import { PageHeader } from "@/components/shared/page-header";
-import { ConsultationRegistrationPreview } from "@/features/consultations/components/consultation-registration-preview";
+import { ConsultationRegistrationForm } from "@/features/consultations/components/consultation-registration-form";
+import { getConsultationRegistrationOptions } from "@/features/consultations/server/consultation-registration";
 
-export default function NewConsultationPage() {
+export default async function NewConsultationPage() {
+  const options = await getConsultationRegistrationOptions();
   return <>
-    <PageHeader title="새 상담 등록" description="등록 화면과 입력 순서를 먼저 확인합니다. 현재는 저장되지 않습니다." />
-    <ConsultationRegistrationPreview />
+    <PageHeader title="새 상담 등록" description="고객 조건과 다음 행동을 기록합니다. 계약 진행·완료는 계약관리에서 처리합니다." />
+    <ConsultationRegistrationForm options={options} />
   </>;
 }

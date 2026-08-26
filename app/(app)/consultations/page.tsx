@@ -1,8 +1,10 @@
 import { PageHeader } from "@/components/shared/page-header";
 import { ConsultationList } from "@/features/consultations/components/consultation-list";
+import { getConsultationList } from "@/features/consultations/server/consultation-registration";
 import Link from "next/link";
 
-export default function ConsultationsPage() {
+export default async function ConsultationsPage() {
+  const { consultations } = await getConsultationList();
   return (
     <>
       <PageHeader
@@ -10,7 +12,7 @@ export default function ConsultationsPage() {
         title="상담 관리"
         action={<Link className="rounded-lg bg-[#3e3a37] px-4 py-2.5 text-xs font-bold text-white" href="/consultations/new">＋ 새 상담 등록</Link>}
       />
-      <ConsultationList />
+      <ConsultationList consultations={consultations} />
     </>
   );
 }

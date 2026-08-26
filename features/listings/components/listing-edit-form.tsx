@@ -5,6 +5,7 @@ import { listingUpdateSchema, type ListingUpdateInput } from "@/features/listing
 import type { ListingDetail, ListingEditData } from "@/features/listings/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { ReactNode } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -15,6 +16,7 @@ function valuesFromListing(listing: ListingDetail, accessPassword: string, owner
 
 export function ListingEditForm({ editData }: { editData: ListingEditData }) {
   const { listing, accessPassword, ownerPhone, tenantPhone } = editData;
+  const router = useRouter();
   const [saved, setSaved] = useState(false);
   const form = useForm<ListingUpdateInput>({ resolver: zodResolver(listingUpdateSchema), defaultValues: valuesFromListing(listing, accessPassword, ownerPhone, tenantPhone) });
   const transactionType = useWatch({ control: form.control, name: "transactionType" });
@@ -22,14 +24,15 @@ export function ListingEditForm({ editData }: { editData: ListingEditData }) {
 
   async function submit(values: ListingUpdateInput) {
     setSaved(false);
-    if (values.listingStatus === "contract_complete" && listing.status !== "contract_complete" && !window.confirm("계약 완료로 바꾸면 상담·계약 확인 업무가 필요할 수 있습니다. 현재 매물 상태를 계약 완료로 저장할까요?")) return;
+    if (values.listingStatus === "contract_complete" && !window.confirm("계약 완료로 저장하면 현재 재고에서 종료되고 과거 매물 이력으로 남습니다. 이후 같은 호실에 새 매물을 등록할 수 있습니다. 계속할까요?")) return;
     const result = await updateListing(values);
     if (!result.ok) {
       Object.entries(result.fieldErrors ?? {}).forEach(([name, messages]) => form.setError(name as keyof ListingUpdateInput, { message: messages[0] }));
       form.setError("root", { message: result.message });
       return;
     }
-    setSaved(true);
+    if (result.movedToHistory) router.push(`/listings/${listing.id}/history`);
+    else setSaved(true);
   }
 
   return <form className="mx-auto max-w-5xl space-y-5" onSubmit={form.handleSubmit(submit)}>

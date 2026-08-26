@@ -1,11 +1,15 @@
 import { PageHeader } from "@/components/shared/page-header";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { consultations, listings } from "@/lib/mock-data/workspace";
+import { StoredConsultationDetail } from "@/features/consultations/components/stored-consultation-detail";
+import { getStoredConsultationDetail } from "@/features/consultations/server/consultation-registration";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 export default async function ConsultationDetailPage({ params }: { params: Promise<{ consultationId: string }> }) {
   const { consultationId } = await params;
+  const stored = await getStoredConsultationDetail(consultationId);
+  if (stored.consultation) return <StoredConsultationDetail consultation={stored.consultation} />;
   const consultation = consultations.find((item) => item.id === consultationId);
   if (!consultation) notFound();
   const proposed = listings.filter((item) => consultation.listingIds.includes(item.id));
