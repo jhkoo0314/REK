@@ -35,9 +35,17 @@
 | 매물 관리 | `/listings` | 검색·필터가 있는 재고 표 | 새 매물 등록 |
 | 건물·호실 | `/buildings` | 3단 탐색기 | 건물·호실 정보 수정 |
 | 계약 관리 | `/contracts` | 계약 목록 + 단계 이력 | 새 계약 작성 |
-| 광고비·문구 | `/advertisements` | 월별 기록·직접입력 문구 | 광고비 입력 |
+| 광고 관리 | `/advertisements` | 월별 플랫폼 기록·유형별 고정 문구 템플릿 | 광고비 입력 |
 
 `/dashboard`는 첫 화면으로 사용하지 않는다. 상담 목록이 비어 있으면 빈 화면에 `첫 상담 등록` 하나를 가장 눈에 띄게 둔다.
+
+### 광고 관리 화면 부품
+
+- `app/(app)/advertisements/page.tsx`는 기준월을 읽고 광고비 화면을 조립한다.
+- `features/advertisements/components/advertising-cost-workspace.tsx`는 기준월 전환, 입력, 합계, 수정·삭제 확인을 맡는다.
+- `features/advertisements/server/advertising-costs.ts`는 조직 확인 뒤 월별 조회·저장·삭제만 처리한다.
+- `features/advertisements/components/advertising-copy-workspace.tsx`는 유형별 템플릿 선택, 확인한 값 입력, 결과 수정·복사와 admin 관리 영역을 맡는다.
+- `features/advertisements/server/advertising-copy-templates.ts`는 조직·admin 확인 뒤 템플릿 조회·저장·삭제만 처리한다.
 
 ## 3. 화면별 디자인 규칙
 
@@ -167,7 +175,7 @@
 3. 상담 목록·등록·상세 타임라인·상담 조건으로 매물 찾기
 4. 계약 생성·출처 상담 연결·단계 이력
 5. 오늘 예정 업무와 완료 체크
-6. 광고비·문구·내보내기
+6. 광고 관리: 월별 플랫폼 광고비와 유형별 고정 문구 템플릿. Excel·CSV 내보내기는 MVP에서 제외
 
 각 단계의 완료 뒤에는 `TODO.md`, `CURRENT_IMPLEMENTATION_STATUS.md`, `BUILD_PROGRESS.md`, 필요 시 루트 `README.md`를 함께 갱신한다.
 

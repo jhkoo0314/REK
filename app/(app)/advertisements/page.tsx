@@ -1,5 +1,19 @@
 import { PageHeader } from "@/components/shared/page-header";
+import { AdvertisingCostWorkspace } from "@/features/advertisements/components/advertising-cost-workspace";
+import { AdvertisingCopyWorkspace } from "@/features/advertisements/components/advertising-copy-workspace";
+import { getAdvertisingCopyTemplates } from "@/features/advertisements/server/advertising-copy-templates";
+import { getMonthlyAdvertisingCosts } from "@/features/advertisements/server/advertising-costs";
 
-export default function AdvertisementsPage() {
-  return <><PageHeader title="광고비·문구" description="월별 광고비와 업무용 문구를 관리합니다." action={<button className="rounded-lg bg-[#3e3a37] px-4 py-2.5 text-xs font-bold text-white">광고비 입력</button>} /><div className="grid max-w-4xl gap-4 lg:grid-cols-2"><section className="rounded-xl border border-[#e5e1db] bg-white p-5"><h2 className="font-extrabold">2026년 8월 광고비</h2><p className="mt-1 text-xs text-[#77736e]">가공 목업 데이터 · 실제 저장하지 않습니다.</p><div className="mt-5 space-y-3 text-sm"><div className="flex justify-between border-b border-[#eeeae5] pb-3"><span>지역 플랫폼</span><b className="font-mono">120,000원</b></div><div className="flex justify-between border-b border-[#eeeae5] pb-3"><span>포털 광고</span><b className="font-mono">80,000원</b></div><div className="flex justify-between font-bold"><span>합계</span><b className="font-mono">200,000원</b></div></div></section><section className="rounded-xl border border-[#e5e1db] bg-white p-5"><h2 className="font-extrabold">광고 문구 초안</h2><p className="mt-1 text-xs text-[#77736e]">사실 확인된 조건만 직접 입력해 작성합니다.</p><textarea className="mt-5 h-32 w-full rounded-lg border border-[#e5e1db] p-3 text-xs" defaultValue={"배방읍 투룸 / 보증금 500 · 월세 55\n즉시 입주 가능 · 주차 가능"} /><button className="mt-3 rounded-lg border border-[#3e3a37] px-3 py-2 text-xs font-bold text-[#3e3a37]">문구 복사</button></section></div></>;
+function currentMonth() {
+  const formatter = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit" });
+  const parts = Object.fromEntries(formatter.formatToParts(new Date()).map((part) => [part.type, part.value]));
+  return `${parts.year}-${parts.month}`;
+}
+
+function validMonth(value: string | undefined) { return value && /^\d{4}-(0[1-9]|1[0-2])$/.test(value) ? value : currentMonth(); }
+
+export default async function AdvertisementsPage({ searchParams }: { searchParams: Promise<{ month?: string }> }) {
+  const { month } = await searchParams; const billingMonth = validMonth(month); const { context, costs, errorMessage } = await getMonthlyAdvertisingCosts(billingMonth); const copyData = context.kind === "ready" ? await getAdvertisingCopyTemplates() : null;
+  if (context.kind !== "ready") return <><PageHeader title="광고 관리" description="월별 플랫폼 광고비를 기록합니다." /><p className="rounded-xl border border-[#e5e1db] bg-white px-5 py-10 text-center text-sm text-[#7b7470]">업무 조직을 확인한 뒤 광고비를 관리할 수 있습니다.</p></>;
+  return <><PageHeader title="광고 관리" description="플랫폼별 월 총 광고비와 유형별 고정 문구 템플릿을 관리합니다." /><div className="space-y-6"><AdvertisingCostWorkspace billingMonth={billingMonth} costs={costs} loadError={errorMessage} /><AdvertisingCopyWorkspace templates={copyData?.templates ?? []} role={context.role} loadError={copyData?.errorMessage ?? null} /></div></>;
 }
