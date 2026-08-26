@@ -3,6 +3,7 @@
 import { contractActivitySchema, type ContractActivityInput } from "@/features/contracts/schemas/contract-activity";
 import { contractCreateSchema, type ContractCreateInput } from "@/features/contracts/schemas/contract-create";
 import { getOrganizationContext } from "@/lib/auth/organization-context";
+import { getSensitiveAccess } from "@/lib/auth/sensitive-access";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
@@ -15,11 +16,12 @@ function labelForListing(item: any) { const unit = Array.isArray(item.units) ? i
 export async function getContractRegistrationOptions() {
   const context = await getOrganizationContext();
   if (context.kind !== "ready") return { context, listings: [] as ContractOption[], consultations: [] as ContractOption[] };
+  const sensitiveAccess = await getSensitiveAccess(context);
   const supabase = createSupabaseServerClient();
   const { data: listings, error: listingError } = await supabase.from("listings").select("id, listing_reference_number, transaction_type, units!inner(unit_number, buildings!inner(name))").eq("organization_id", context.organizationId).eq("is_current", true).order("listing_reference_number", { ascending: false });
   const { data: consultations, error: consultationError } = await supabase.from("consultations").select("id, consultation_reference_number, customer_name, customer_phone").eq("organization_id", context.organizationId).order("consultation_date", { ascending: false });
   if (listingError || consultationError) throw new Error("계약 등록에 필요한 매물 또는 상담 정보를 불러오지 못했습니다. P1 migration 적용 상태를 확인해 주세요.");
-  return { context, listings: (listings ?? []).map((item) => ({ id: item.id, label: labelForListing(item), transactionType: item.transaction_type })), consultations: (consultations ?? []).map((item) => ({ id: item.id, label: `S-${String(item.consultation_reference_number).padStart(6, "0")} · ${item.customer_name ?? "이름 미입력"} · ${item.customer_phone}` })) };
+  return { context, listings: (listings ?? []).map((item) => ({ id: item.id, label: labelForListing(item), transactionType: item.transaction_type })), consultations: (consultations ?? []).map((item) => ({ id: item.id, label: `S-${String(item.consultation_reference_number).padStart(6, "0")} · ${item.customer_name ?? "이름 미입력"}${sensitiveAccess.consultationContacts ? ` · ${item.customer_phone}` : ""}` })) };
 }
 
 export async function getContractList() {

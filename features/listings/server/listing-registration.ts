@@ -1,6 +1,7 @@
 "use server";
 
 import { getOrganizationContext } from "@/lib/auth/organization-context";
+import { getSensitiveAccess } from "@/lib/auth/sensitive-access";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { normalizeForMatch, normalizeUnitNumber } from "@/lib/text-normalize";
 import { listingCreateSchema, type ListingCreateInput } from "@/features/listings/schemas/listing-create";
@@ -12,11 +13,12 @@ import { revalidatePath } from "next/cache";
 type BuildingOption = { id: string; name: string; address: string };
 type UnitOption = { id: string; buildingId: string; unitNumber: string; layoutType: string | null };
 
-export type ListingRegistrationOptions = { context: Awaited<ReturnType<typeof getOrganizationContext>>; buildings: BuildingOption[]; units: UnitOption[] };
+export type ListingRegistrationOptions = { context: Awaited<ReturnType<typeof getOrganizationContext>>; buildings: BuildingOption[]; units: UnitOption[]; sensitiveAccess: { propertyContacts: boolean; unitAccess: boolean } };
 
 export async function getListingRegistrationOptions(): Promise<ListingRegistrationOptions> {
   const context = await getOrganizationContext();
-  if (context.kind !== "ready") return { context, buildings: [], units: [] };
+  if (context.kind !== "ready") return { context, buildings: [], units: [], sensitiveAccess: { propertyContacts: false, unitAccess: false } };
+  const sensitiveAccess = await getSensitiveAccess(context);
 
   const supabase = createSupabaseServerClient();
   const [{ data: buildings, error: buildingError }, { data: units, error: unitError }] = await Promise.all([
@@ -27,6 +29,7 @@ export async function getListingRegistrationOptions(): Promise<ListingRegistrati
   if (buildingError || unitError) throw new Error("건물·호실 선택 정보를 불러오지 못했습니다.");
   return {
     context,
+    sensitiveAccess: { propertyContacts: sensitiveAccess.propertyContacts, unitAccess: sensitiveAccess.unitAccess },
     buildings: (buildings ?? []).map((building) => ({ id: building.id, name: building.name, address: building.road_address ?? building.lot_address ?? "주소 미입력" })),
     units: (units ?? []).map((unit) => ({ id: unit.id, buildingId: unit.building_id, unitNumber: unit.unit_number, layoutType: unit.layout_type })),
   };
@@ -114,12 +117,13 @@ export async function createListing(values: ListingCreateInput): Promise<Listing
 
   const context = await getOrganizationContext();
   if (context.kind !== "ready") return { ok: false, message: "활성 조직 멤버십을 확인할 수 없습니다." };
+  const sensitiveAccess = await getSensitiveAccess(context);
 
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase.rpc("create_p0_listing", {
     p_organization_id: context.organizationId,
     p_clerk_user_id: context.clerkUserId,
-    p_payload: toPayload(parsed.data),
+    p_payload: toPayload({ ...parsed.data, accessPassword: sensitiveAccess.unitAccess ? parsed.data.accessPassword : "", ownerPhone: sensitiveAccess.propertyContacts ? parsed.data.ownerPhone : "", tenantPhone: sensitiveAccess.propertyContacts ? parsed.data.tenantPhone : "" }),
   });
 
   if (error) {
@@ -188,6 +192,8 @@ export async function quickUpdateListing(values: ListingQuickUpdateInput): Promi
 export async function getListingAccessPassword(listingId: string): Promise<ListingAccessPasswordResult> {
   const context = await getOrganizationContext();
   if (context.kind !== "ready") return { ok: false, message: "활성 조직 멤버십을 확인할 수 없습니다." };
+  const sensitiveAccess = await getSensitiveAccess(context);
+  if (!sensitiveAccess.unitAccess) return { ok: false, message: "세대 비밀번호 열람 권한이 없습니다. 관리자에게 권한을 요청해 주세요." };
 
   const supabase = createSupabaseServerClient();
   const { data: listing, error: listingError } = await supabase
@@ -216,6 +222,7 @@ export async function updateListing(values: ListingUpdateInput): Promise<Listing
 
   const context = await getOrganizationContext();
   if (context.kind !== "ready") return { ok: false, message: "활성 조직 멤버십을 확인할 수 없습니다." };
+  const sensitiveAccess = await getSensitiveAccess(context);
 
   const value = parsed.data;
   const supabase = createSupabaseServerClient();
@@ -245,21 +252,20 @@ export async function updateListing(values: ListingUpdateInput): Promise<Listing
 
   if (error) return { ok: false, message: "매물 수정에 실패했습니다. 입력값과 Dev DB 상태를 확인해 주세요." };
   if (!data) return { ok: false, message: "수정할 현재 매물을 찾지 못했습니다." };
-  const { data: existingAccess, error: accessReadError } = await supabase
+  const { data: existingAccess, error: accessReadError } = sensitiveAccess.unitAccess ? await supabase
     .from("unit_access_details")
     .select("id")
     .eq("organization_id", context.organizationId)
     .eq("unit_id", data.unit_id)
-    .maybeSingle();
+    .maybeSingle() : { data: null, error: null };
   if (accessReadError) return { ok: false, message: "세대 비밀번호 정보를 확인하지 못했습니다. 매물 조건은 저장됐으니 다시 열어 확인해 주세요." };
-  if (value.accessPassword || existingAccess) {
+  if (sensitiveAccess.unitAccess && (value.accessPassword || existingAccess)) {
     const { error: accessError } = await supabase
       .from("unit_access_details")
       .upsert({ organization_id: context.organizationId, unit_id: data.unit_id, access_password: value.accessPassword || null, created_by_clerk_user_id: context.clerkUserId, updated_by_clerk_user_id: context.clerkUserId }, { onConflict: "unit_id" });
     if (accessError) return { ok: false, message: "세대 비밀번호 저장에 실패했습니다. 매물 조건은 저장됐으니 다시 열어 확인해 주세요." };
   }
-  const buildingId = await getBuildingIdForListing(supabase, context.organizationId, value.id);
-  if (!buildingId || !await saveBuildingOwnerContact({ supabase, organizationId: context.organizationId, clerkUserId: context.clerkUserId, buildingId, phone: value.ownerPhone }) || !await saveUnitTenantContact({ supabase, organizationId: context.organizationId, clerkUserId: context.clerkUserId, unitId: data.unit_id, phone: value.tenantPhone })) return { ok: false, message: "매물 조건은 저장됐지만 제한 연락처를 저장하지 못했습니다. unit_contacts migration을 적용한 뒤 수정 화면에서 다시 저장해 주세요." };
+  if (sensitiveAccess.propertyContacts) { const buildingId = await getBuildingIdForListing(supabase, context.organizationId, value.id); if (!buildingId || !await saveBuildingOwnerContact({ supabase, organizationId: context.organizationId, clerkUserId: context.clerkUserId, buildingId, phone: value.ownerPhone }) || !await saveUnitTenantContact({ supabase, organizationId: context.organizationId, clerkUserId: context.clerkUserId, unitId: data.unit_id, phone: value.tenantPhone })) return { ok: false, message: "매물 조건은 저장됐지만 제한 연락처를 저장하지 못했습니다. unit_contacts migration을 적용한 뒤 수정 화면에서 다시 저장해 주세요." }; }
   revalidatePath("/listings");
   revalidatePath(`/listings/${value.id}`);
   revalidatePath(`/listings/${value.id}/edit`);

@@ -49,4 +49,4 @@ export type ListingDetail = ListingListItem & {
   endReason: ListingEndReason | null;
 };
 
-export type ListingEditData = { listing: ListingDetail; accessPassword: string; ownerPhone: string; tenantPhone: string };
+export type ListingEditData = { listing: ListingDetail; accessPassword: string; ownerPhone: string; tenantPhone: string; sensitiveAccess: { propertyContacts: boolean; unitAccess: boolean } };

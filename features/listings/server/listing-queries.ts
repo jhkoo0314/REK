@@ -1,4 +1,5 @@
 import { getOrganizationContext } from "@/lib/auth/organization-context";
+import { getSensitiveAccess } from "@/lib/auth/sensitive-access";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AvailabilityType, ListingDetail, ListingEditData, ListingFilters, ListingListItem, ListingStatus, PhotoStatus, TransactionType } from "@/features/listings/types";
 
@@ -153,6 +154,7 @@ export async function getListingHistoryDetail(listingId: string) {
 export async function getListingEditData(listingId: string) {
   const result = await getListingDetail(listingId);
   if (result.context.kind !== "ready" || !result.listing) return { ...result, editData: null as ListingEditData | null };
+  const sensitiveAccess = await getSensitiveAccess(result.context);
 
   const supabase = createSupabaseServerClient();
   const [{ data: access, error: accessError }, { data: ownerContact, error: ownerError }, { data: tenantContact, error: tenantError }] = await Promise.all([
@@ -161,7 +163,7 @@ export async function getListingEditData(listingId: string) {
     supabase.from("unit_contacts").select("phone_number").eq("organization_id", result.context.organizationId).eq("unit_id", result.listing.unitId).eq("contact_role", "tenant").maybeSingle(),
   ]);
   if (accessError || ownerError || tenantError) throw new Error("제한 정보를 불러오지 못했습니다. unit_contacts migration 적용 여부를 확인해 주세요.");
-  const ownerPhone = ownerContact?.phone_number ?? "";
-  const tenantPhone = tenantContact?.phone_number ?? "";
-  return { ...result, editData: { listing: result.listing, accessPassword: access?.access_password ?? "", ownerPhone, tenantPhone } };
+  const ownerPhone = sensitiveAccess.propertyContacts ? ownerContact?.phone_number ?? "" : "";
+  const tenantPhone = sensitiveAccess.propertyContacts ? tenantContact?.phone_number ?? "" : "";
+  return { ...result, editData: { listing: result.listing, accessPassword: sensitiveAccess.unitAccess ? access?.access_password ?? "" : "", ownerPhone, tenantPhone, sensitiveAccess: { propertyContacts: sensitiveAccess.propertyContacts, unitAccess: sensitiveAccess.unitAccess } } };
 }

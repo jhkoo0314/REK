@@ -4,6 +4,7 @@ import { consultationCreateSchema, type ConsultationCreateInput } from "@/featur
 import { consultationFollowupDeleteSchema, consultationFollowupSchema, consultationFollowupUpdateSchema, type ConsultationFollowupInput, type ConsultationFollowupUpdateInput } from "@/features/consultations/schemas/consultation-followup";
 import { consultationDeleteSchema, consultationInitialListingSchema, consultationUpdateSchema, type ConsultationUpdateInput } from "@/features/consultations/schemas/consultation-edit";
 import { getOrganizationContext } from "@/lib/auth/organization-context";
+import { getSensitiveAccess } from "@/lib/auth/sensitive-access";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
@@ -60,6 +61,7 @@ export async function getConsultationRegistrationOptions(): Promise<Consultation
 export async function getStoredConsultationDetail(consultationId: string): Promise<{ context: Awaited<ReturnType<typeof getOrganizationContext>>; consultation: StoredConsultationDetail | null }> {
   const context = await getOrganizationContext();
   if (context.kind !== "ready") return { context, consultation: null };
+  const sensitiveAccess = await getSensitiveAccess(context);
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase.from("consultations").select("id, customer_name, customer_phone, category, consultation_date, inflow_source, consultation_method, consultation_note, desired_areas, desired_areas_other, desired_room_types, desired_room_types_other, desired_deposit_budget, desired_monthly_rent_budget, desired_move_in_date, required_features_note, status, progress_stage, next_contact_date, closed_reason, initial_listing_id").eq("id", consultationId).eq("organization_id", context.organizationId).maybeSingle();
   if (error || !data) return { context, consultation: null };
@@ -75,7 +77,7 @@ export async function getStoredConsultationDetail(consultationId: string): Promi
   const { data: followups, error: followupError } = await supabase.from("consultation_followups").select("id, followup_date, followup_method, progress_stage, visit_result, closed_reason, next_contact_date, note").eq("consultation_id", data.id).eq("organization_id", context.organizationId).order("followup_date", { ascending: false }).order("created_at", { ascending: false });
   if (followupError) throw new Error("상담 후속 이력을 불러오지 못했습니다.");
   return { context, consultation: {
-    id: data.id, customerName: data.customer_name ?? "이름 미입력", customerPhone: data.customer_phone, category: data.category, consultationDate: data.consultation_date, inflowSource: data.inflow_source, consultationMethod: data.consultation_method, consultationNote: data.consultation_note,
+    id: data.id, customerName: data.customer_name ?? "이름 미입력", customerPhone: sensitiveAccess.consultationContacts ? data.customer_phone : "", category: data.category, consultationDate: data.consultation_date, inflowSource: data.inflow_source, consultationMethod: data.consultation_method, consultationNote: data.consultation_note,
     desiredAreas: data.desired_areas ?? [], desiredAreasOther: data.desired_areas_other, desiredRoomTypes: data.desired_room_types ?? [], desiredRoomTypesOther: data.desired_room_types_other, desiredDepositBudget: data.desired_deposit_budget, desiredMonthlyRentBudget: data.desired_monthly_rent_budget, desiredMoveInDate: data.desired_move_in_date, requiredFeaturesNote: data.required_features_note,
     status: data.status, progressStage: data.progress_stage, nextContactDate: data.next_contact_date, closedReason: data.closed_reason, initialListingId: data.initial_listing_id, initialListingLabel,
     followups: (followups ?? []).map((item) => ({ id: item.id, followupDate: item.followup_date, followupMethod: item.followup_method, progressStage: item.progress_stage, visitResult: item.visit_result, closedReason: item.closed_reason, nextContactDate: item.next_contact_date, note: item.note })),
@@ -85,6 +87,7 @@ export async function getStoredConsultationDetail(consultationId: string): Promi
 export async function getConsultationList(): Promise<{ context: Awaited<ReturnType<typeof getOrganizationContext>>; consultations: ConsultationListItem[] }> {
   const context = await getOrganizationContext();
   if (context.kind !== "ready") return { context, consultations: [] };
+  const sensitiveAccess = await getSensitiveAccess(context);
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase.from("consultations").select("id, consultation_reference_number, initial_listing_id, customer_name, customer_phone, category, inflow_source, consultation_date, status, progress_stage, next_contact_date, closed_reason, latest_followup_date, latest_followup_method, desired_areas, desired_areas_other, desired_room_types, desired_room_types_other, desired_deposit_budget, desired_monthly_rent_budget").eq("organization_id", context.organizationId).order("consultation_date", { ascending: false }).order("created_at", { ascending: false });
   if (error) throw new Error("상담 목록을 불러오지 못했습니다. Dev DB의 P1 상담 migration 적용 상태를 확인해 주세요.");
@@ -97,7 +100,7 @@ export async function getConsultationList(): Promise<{ context: Awaited<ReturnTy
     return [listing.id, `M-${String(listing.listing_reference_number ?? "").padStart(6, "0")} · ${building?.name ?? "건물"} ${unit?.unit_number ?? "호실"}`];
   }));
   return { context, consultations: (data ?? []).map((item) => ({
-    id: item.id, referenceNumber: item.consultation_reference_number, customerName: item.customer_name ?? "이름 미입력", customerPhone: item.customer_phone, category: item.category, inflowSource: item.inflow_source, consultationDate: item.consultation_date, status: item.status, progressStage: item.progress_stage, nextContactDate: item.next_contact_date, closedReason: item.closed_reason, initialListingLabel: item.initial_listing_id ? listingLabelById.get(item.initial_listing_id) ?? "연결 매물 확인 필요" : null, latestFollowupDate: item.latest_followup_date, latestFollowupMethod: item.latest_followup_method,
+    id: item.id, referenceNumber: item.consultation_reference_number, customerName: item.customer_name ?? "이름 미입력", customerPhone: sensitiveAccess.consultationContacts ? item.customer_phone : "", category: item.category, inflowSource: item.inflow_source, consultationDate: item.consultation_date, status: item.status, progressStage: item.progress_stage, nextContactDate: item.next_contact_date, closedReason: item.closed_reason, initialListingLabel: item.initial_listing_id ? listingLabelById.get(item.initial_listing_id) ?? "연결 매물 확인 필요" : null, latestFollowupDate: item.latest_followup_date, latestFollowupMethod: item.latest_followup_method,
     desiredAreas: item.desired_areas ?? [], desiredAreasOther: item.desired_areas_other, desiredRoomTypes: item.desired_room_types ?? [], desiredRoomTypesOther: item.desired_room_types_other, desiredDepositBudget: item.desired_deposit_budget, desiredMonthlyRentBudget: item.desired_monthly_rent_budget,
   })) };
 }

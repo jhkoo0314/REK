@@ -12,6 +12,7 @@ const navigation = [
   { href: "/buildings", label: "건물·호실" },
   { href: "/contracts", label: "계약 관리" },
   { href: "/advertisements", label: "광고비·문구" },
+  { href: "/members", label: "멤버 권한" },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
