@@ -32,7 +32,7 @@ export function ConsultationRegistrationPreview() {
       {isListingConsultation && <label className="block"><span className="mb-2 block text-sm font-bold">최초 문의 매물</span><select className="field"><option>매물 선택 (목업)</option><option>M-000042 · 대성빌 302호 · 투룸 · 500 / 55</option><option>M-000040 · 그린타운 202호 · 투룸 · 500 / 52</option></select><span className="mt-1 block text-[11px] text-[#7b7470]">실제 매물 검색·선택은 매물 DB 연결 단계에서 구현합니다.</span></label>}
 
       <div className="grid gap-4 md:grid-cols-2">
-        <label><span className="label">고객 이름 또는 식별명</span><input className="field" placeholder="예: 김○○ 또는 별칭" /></label>
+
         <label><span className="label">고객 연락처</span><input className="field" inputMode="tel" placeholder="예: 010-1234-5678" /></label>
       </div>
 

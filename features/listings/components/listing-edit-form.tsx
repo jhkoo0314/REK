@@ -48,8 +48,8 @@ export function ListingEditForm({ editData }: { editData: ListingEditData }) {
         <Field label="입주 가능 조건"><select className="field" {...form.register("availabilityType")}><option value="immediate">즉시 가능</option><option value="date_specified">날짜 지정</option><option value="needs_confirmation">확인 필요</option></select></Field>
         {availabilityType === "date_specified" && <Field error={form.formState.errors.availableDate?.message} label="입주 가능일"><input className="field" type="date" {...form.register("availableDate")} /></Field>}
         <Field label="퇴실 예정일"><input className="field" type="date" {...form.register("moveOutDate")} /></Field>
-        <Field label="사진 상태"><select className="field" {...form.register("photoStatus")}><option value="not_available">사진 없음</option><option value="available">사진 있음</option><option value="needs_confirmation">사진 확인 필요</option></select></Field>
-        <Field label="마지막 재확인일"><input className="field" type="date" {...form.register("lastConfirmedDate")} /></Field>
+
+
         <label className="md:col-span-2 xl:col-span-3"><span className="label">보유처</span><input className="field" {...form.register("holdingSource")} /></label>
         {sensitiveAccess.unitAccess && <Field label="세대 비밀번호 (제한 정보)"><input className="field" autoComplete="new-password" type="password" {...form.register("accessPassword")} /><span className="mt-1 block text-[11px] text-[#7b7470]">이 수정 화면에서만 확인·변경할 수 있습니다.</span></Field>}
         {sensitiveAccess.propertyContacts && <><Field label="임대인 연락처 (제한 정보)" error={form.formState.errors.ownerPhone?.message}><input className="field" inputMode="tel" type="tel" {...form.register("ownerPhone")} /></Field><Field label="세입자 연락처 (제한 정보)" error={form.formState.errors.tenantPhone?.message}><input className="field" inputMode="tel" type="tel" {...form.register("tenantPhone")} /></Field></>}

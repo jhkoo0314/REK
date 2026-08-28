@@ -47,10 +47,10 @@ export function ConsultationRegistrationForm({ options }: { options: Consultatio
   return <form className="mx-auto max-w-5xl space-y-5" onSubmit={form.handleSubmit(submit)}>
     <section className="rounded-xl border border-[#e5e1db] bg-white">
       <SectionHeader title="상담 기본 정보" description="일반 문의는 매물 없이 시작할 수 있습니다. 매물 문의는 최초 문의 매물을 연결해 기록합니다." />
-      <div className="grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-4">
         <label><span className="label">상담 구분</span><select className="field" {...form.register("category")}><option value="general">일반 상담</option><option value="listing">매물 상담</option></select></label>
         {category === "listing" && <label className="xl:col-span-2"><span className="label">최초 문의 매물</span><select className="field" {...form.register("initialListingId")}><option value="">매물 선택</option>{options.listings.map((listing) => <option key={listing.id} value={listing.id}>{listing.label}</option>)}</select><FieldError message={form.formState.errors.initialListingId?.message} /></label>}
-        <label><span className="label">고객 이름 또는 식별명 <em className="not-italic font-normal text-[#7b7470]">(선택)</em></span><input className="field" placeholder="예: 김○○ 또는 별칭" {...form.register("customerName")} /><FieldError message={form.formState.errors.customerName?.message} /></label>
+
         <label><span className="label">고객 연락처</span><input className="field" inputMode="tel" placeholder="010-1234-5678" {...form.register("customerPhone", { onChange: (event) => { event.target.value = formatPhoneNumber(event.target.value); } })} /><FieldError message={form.formState.errors.customerPhone?.message} /></label>
         <label><span className="label">상담일</span><input className="field" type="date" {...form.register("consultationDate")} /><FieldError message={form.formState.errors.consultationDate?.message} /></label>
         <label><span className="label">유입 경로</span><select className="field" {...form.register("inflowSource")}>{sources.map((source) => <option key={source} value={source}>{source}</option>)}</select></label>
