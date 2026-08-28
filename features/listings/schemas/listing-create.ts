@@ -7,17 +7,14 @@ export const listingCreateSchema = z.object({
   buildingMode: z.enum(["existing", "new"]),
   buildingId: z.string(),
   buildingName: z.string().trim(),
-  roadAddress: z.string().trim(),
   lotAddress: z.string().trim(),
-  addressDetail: z.string().trim(),
-  postalCode: z.string().trim(),
   unitMode: z.enum(["existing", "new"]),
   unitId: z.string(),
   unitNumber: z.string().trim(),
   floor: optionalInteger,
   layoutType: z.string().trim(),
   direction: z.string().trim(),
-  optionsText: z.string().trim(),
+  elevatorOption: z.enum(["", "엘리베이터 있음", "엘리베이터 없음"]),
   accessPassword: z.string().trim(),
   ownerPhone: z.string().trim().refine((value) => value === "" || /^[0-9+()\-\s]{7,25}$/.test(value), "연락처 형식을 확인해 주세요."),
   tenantPhone: z.string().trim().refine((value) => value === "" || /^[0-9+()\-\s]{7,25}$/.test(value), "연락처 형식을 확인해 주세요."),
@@ -37,7 +34,7 @@ export const listingCreateSchema = z.object({
   if (values.buildingMode === "existing" && !values.buildingId) context.addIssue({ code: "custom", path: ["buildingId"], message: "기존 건물을 선택해 주세요." });
   if (values.buildingMode === "new") {
     if (!values.buildingName) context.addIssue({ code: "custom", path: ["buildingName"], message: "건물명을 입력해 주세요." });
-    if (!values.roadAddress && !values.lotAddress) context.addIssue({ code: "custom", path: ["roadAddress"], message: "도로명 주소 또는 지번 주소를 입력해 주세요." });
+    if (!values.lotAddress) context.addIssue({ code: "custom", path: ["lotAddress"], message: "지번 주소를 입력해 주세요." });
   }
   if (values.unitMode === "existing" && !values.unitId) context.addIssue({ code: "custom", path: ["unitId"], message: "기존 호실을 선택해 주세요." });
   if (values.unitMode === "new" && !values.unitNumber) context.addIssue({ code: "custom", path: ["unitNumber"], message: "호실을 입력해 주세요." });

@@ -45,8 +45,7 @@
 - `features/advertisements/components/advertisement-view-switcher.tsx`는 `월별 광고비`와 `광고 문구`를 한 화면에 섞지 않고 주소가 남는 상단 전환 배지로 나눈다.
 - `features/advertisements/components/advertising-cost-workspace.tsx`는 기준월 전환, 입력, 합계, 수정·삭제 확인을 맡는다.
 - `features/advertisements/server/advertising-costs.ts`는 조직 확인 뒤 월별 조회·저장·삭제만 처리한다.
-- `features/advertisements/default-copy-templates.ts`는 Streamlit의 기본형·특징 강조형 흐름을 정리한 읽기 전용 기본 문구를 둔다. `features/advertisements/components/advertising-copy-workspace.tsx`는 유형별 템플릿 선택, 확인한 값 입력, 결과 수정·복사와 admin의 기본 문구 불러오기·사무실 템플릿 관리 영역을 맡는다.
-- `features/advertisements/server/advertising-copy-templates.ts`는 조직·admin 확인 뒤 템플릿 조회·저장·삭제만 처리한다.
+- `features/advertisements/default-copy-templates.ts`는 Streamlit의 기본형·특징 강조형 흐름을 정리한 읽기 전용 기본 문구를 둔다. `features/advertisements/components/advertising-copy-workspace.tsx`는 유형별 템플릿 선택, 확인한 값 입력, 결과 수정·복사를 맡는다.
 - `app/(app)/members/page.tsx`와 `features/members/components/sensitive-permissions-workspace.tsx`는 admin의 staff별 민감정보 열람 설정만 처리한다.
 
 ## 3. 화면별 디자인 규칙
