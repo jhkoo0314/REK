@@ -7,7 +7,7 @@ export async function getContractDetail(contractId: string) {
   if (context.kind !== "ready") return { context, contract: null };
   const sensitiveAccess = await getSensitiveAccess(context);
   const supabase = createSupabaseServerClient();
-  const { data: contract, error } = await supabase.from("contracts").select("id, contract_reference_number, listing_id, source_consultation_id, transaction_type, contract_kind, brokerage_type, status, contract_started_date, official_contract_date, move_in_date, end_date, total_contract_deposit_amount, provisional_deposit_amount, additional_deposit_due_date, balance_amount, balance_due_date, note").eq("id", contractId).eq("organization_id", context.organizationId).maybeSingle();
+  const { data: contract, error } = await supabase.from("contracts").select("id, contract_reference_number, listing_id, source_consultation_id, responsible_clerk_user_id, transaction_type, contract_kind, brokerage_type, status, contract_started_date, official_contract_date, move_in_date, end_date, total_contract_deposit_amount, provisional_deposit_amount, additional_deposit_due_date, balance_amount, balance_due_date, note").eq("id", contractId).eq("organization_id", context.organizationId).maybeSingle();
   if (error || !contract) return { context, contract: null };
   const [{ data: listing }, { data: consultation }, { data: activities }] = await Promise.all([
     supabase.from("listings").select("id, listing_reference_number, units!inner(unit_number, buildings!inner(name))").eq("id", contract.listing_id).eq("organization_id", context.organizationId).maybeSingle(),

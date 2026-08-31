@@ -12,6 +12,7 @@ const navigation = [
   { href: "/buildings", label: "건물·호실" },
   { href: "/contracts", label: "계약 관리", children: [{ href: "/contracts", label: "계약 조회" }, { href: "/contracts/new", label: "계약 등록" }] },
   { href: "/advertisements", label: "광고비·문구" },
+  { href: "/revenue", label: "매출관리" },
   { href: "/members", label: "멤버 권한" },
 ];
 

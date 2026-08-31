@@ -59,6 +59,7 @@
 | `features/advertisements/` | 월별 광고비, 매물 조건 기반 광고 문구 생성·복사 |
 | `features/members/` | 직원별 민감정보 열람 권한 |
 | `features/property-types/` | 향후 매물 유형 확장을 위한 화면 미리보기 |
+| `features/revenue/` | 중개수수료 정산, 수납·환불, 담당자별 매출관리 |
 
 ## 5. DB 변경 파일 확인 방법
 
@@ -72,6 +73,9 @@
 | `20260831000200_remove_listing_photo_and_recheck.sql` | 사진 유무·재확인일 제거 | Dev DB 적용 완료 |
 | `20260831000300_allow_contract_historical_listing_selection.sql` | 계약 등록에서 과거 매물 이력 선택 허용 | Dev DB 적용 완료 |
 | `20260831000400_relist_after_completed_contract_cancellation.sql` | 계약 완료 후 해지·만료 시 새 공실 매물 생성 규칙 | Dev DB 적용 완료 |
+| `20260901000100_add_contract_revenue_management.sql` | 중개수수료 정산·수납·환불·담당자별 매출관리 | Dev DB 적용 완료 |
+| `20260901000200_add_member_default_revenue_rates.sql` | 관리자 직원별 기본 담당자 수수료 비율 | Dev DB 적용 대기 |
+| `20260901000300_split_contract_commission_by_party.sql` | 임차인·임대인 수수료 분리 | Dev DB 적용 대기 |
 
 ## 6. 현재 폴더 구조 요약
 
