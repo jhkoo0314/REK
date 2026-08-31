@@ -162,10 +162,19 @@
 | 매물 전용 | `features/listings/components/` | `ListingTable`, `ListingFilters`, `ListingQuickEdit`, `ListingPicker`, `BuildingExplorer` |
 | 계약 전용 | `features/contracts/components/` | `ContractList`, `ContractFilters`, `ContractTimeline`, `ContractStatusConfirmDialog` |
 | 인박스 전용 | `features/tasks/components/` | `TaskInbox`, `TaskGroup`, `TaskCompletionControl` |
+| 매출 전용 | `features/revenue/components/` | `RevenueWorkspace`, `RevenueAnalysisWorkspace` |
 
 - `MetricCard`는 기본 공통 부품으로 만들지 않는다. 업무상 꼭 필요한 작은 수치 요약이 확인된 화면에만 제한적으로 추가한다.
 - `FilterPill`은 대시보드용 부품이 아니라, 목록에서 실제로 반복 사용하는 상태·기한 필터일 때만 공통화한다.
 - 페이지 전용 컴포넌트가 다른 화면에서도 같은 목적·모양으로 반복될 때에만 `components/shared/`로 옮긴다.
+
+### 매출 현황 화면 부품
+
+- `app/(app)/revenue/status/page.tsx`는 필터 값을 읽고 현황 데이터를 연결하는 조립 역할만 한다.
+- `features/revenue/server/revenue-analysis.ts`는 조직·역할을 확인한 뒤 기존 계약·정산·수납·환불 기록만 집계한다. staff에게는 서버 단계부터 본인 담당 계약의 본인 배분 금액만 전달한다.
+- `features/revenue/components/revenue-analysis-workspace.tsx`는 기간·조건 필터, 요약 수치, 담당자·매물 형태·월별 결과, 미수금 목록을 표시한다.
+- 새 DB 항목이나 차트 라이브러리는 추가하지 않는다. 수치는 표와 작은 요약 카드로 확인한다.
+- 현황 화면의 기본 영역에는 핵심 카드와 담당자·매물 형태·월별 결과 전체, 미수금 건수·합계만 둔다. 거래 방식 분석은 제공하지 않는다. 미수금 계약 목록은 `미수금 계약 목록 보기`를 눌렀을 때만 펼쳐서 기본 화면의 복잡도를 낮춘다.
 
 ## 6. 구현 순서와 화면 연결
 

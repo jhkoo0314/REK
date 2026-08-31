@@ -33,6 +33,8 @@
 | 매물관리 | `/listings` | `app/(app)/listings/` | `features/listings/` |
 | 건물·호실 관리 | `/buildings` | `app/(app)/buildings/page.tsx` | `features/listings/` |
 | 계약관리 | `/contracts` | `app/(app)/contracts/` | `features/contracts/` |
+| 매출 정산 | `/revenue` | `app/(app)/revenue/page.tsx` | `features/revenue/` |
+| 매출 현황 | `/revenue/status` | `app/(app)/revenue/status/page.tsx` | `features/revenue/` |
 | 광고관리 | `/advertisements` | `app/(app)/advertisements/page.tsx` | `features/advertisements/` |
 | 구성원 권한 | `/members` | `app/(app)/members/page.tsx` | `features/members/` |
 | 매물 유형 미리보기 | `/property-types` | `app/(app)/property-types/` | `features/property-types/` |
@@ -59,7 +61,7 @@
 | `features/advertisements/` | 월별 광고비, 매물 조건 기반 광고 문구 생성·복사 |
 | `features/members/` | 직원별 민감정보 열람 권한 |
 | `features/property-types/` | 향후 매물 유형 확장을 위한 화면 미리보기 |
-| `features/revenue/` | 중개수수료 정산, 수납·환불, 담당자별 매출관리 |
+| `features/revenue/` | 중개수수료 정산, 수납·환불, 담당자별·매물 형태별·월별 매출 현황 조회 |
 
 ## 5. DB 변경 파일 확인 방법
 
@@ -76,6 +78,7 @@
 | `20260901000100_add_contract_revenue_management.sql` | 중개수수료 정산·수납·환불·담당자별 매출관리 | Dev DB 적용 완료 |
 | `20260901000200_add_member_default_revenue_rates.sql` | 관리자 직원별 기본 담당자 수수료 비율 | Dev DB 적용 대기 |
 | `20260901000300_split_contract_commission_by_party.sql` | 임차인·임대인 수수료 분리 | Dev DB 적용 대기 |
+| `20260901000400_convert_revenue_amounts_to_won.sql` | 중개수수료 정산·수납·환불 금액을 원 단위로 전환 | Dev DB 적용 대기 |
 
 ## 6. 현재 폴더 구조 요약
 
@@ -90,7 +93,8 @@ realestate_web/
 │  │  ├─ dashboard/             오늘 할 일
 │  │  ├─ listings/              매물관리
 │  │  ├─ members/               구성원 권한
-│  │  └─ property-types/        유형별 화면 미리보기
+│  │  ├─ property-types/        유형별 화면 미리보기
+│  │  └─ revenue/               매출 정산·매출 현황
 │  ├─ sign-in/                  로그인
 │  └─ sign-up/                  회원가입
 ├─ components/shared/           공통 앱 화면 부품

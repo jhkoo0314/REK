@@ -12,13 +12,13 @@ const navigation = [
   { href: "/buildings", label: "건물·호실" },
   { href: "/contracts", label: "계약 관리", children: [{ href: "/contracts", label: "계약 조회" }, { href: "/contracts/new", label: "계약 등록" }] },
   { href: "/advertisements", label: "광고비·문구" },
-  { href: "/revenue", label: "매출관리" },
+  { href: "/revenue", label: "매출관리", children: [{ href: "/revenue", label: "매출 정산" }, { href: "/revenue/status", label: "매출 현황" }] },
   { href: "/members", label: "멤버 권한" },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const [expanded, setExpanded] = useState(pathname.startsWith("/contracts"));
+  const [expanded, setExpanded] = useState<"contracts" | "revenue" | null>(pathname.startsWith("/contracts") ? "contracts" : pathname.startsWith("/revenue") ? "revenue" : null);
 
   return (
     <div className="min-h-screen bg-[#faf8f4] text-[#302b28] lg:grid lg:grid-cols-[224px_1fr]">
@@ -37,16 +37,16 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Fragment key={item.href}>
               {item.children ? <button
                 type="button"
-                onClick={() => setExpanded((value) => !value)}
+                onClick={() => setExpanded((value) => value === item.href.slice(1) ? null : item.href.slice(1) as "contracts" | "revenue")}
                 className={`w-full text-left whitespace-nowrap rounded-lg px-3 py-3 text-sm font-bold tracking-[-0.02em] transition ${active ? "bg-[#f3e4dc] text-[#8f4e36]" : "text-[#655d59] hover:bg-[#eae3dc] hover:text-[#302b28]"}`}
               >
                 {active && <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-[#a85f43]" />}
-                {item.label}<span className="ml-2 text-xs">{expanded ? "▾" : "▸"}</span>
+                {item.label}<span className="ml-2 text-xs">{expanded === item.href.slice(1) ? "▾" : "▸"}</span>
               </button> : <Link
                 className={`whitespace-nowrap rounded-lg px-3 py-3 text-sm font-bold tracking-[-0.02em] transition ${active ? "bg-[#f3e4dc] text-[#8f4e36]" : "text-[#655d59] hover:bg-[#eae3dc] hover:text-[#302b28]"}`}
                 href={item.href}
               >{active && <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-[#a85f43]" />}{item.label}</Link>}
-              {item.children && expanded && <div className="ml-3 grid gap-1 border-l border-[#dfd4cb] pl-2">{item.children.map((child) => { const childActive = pathname === child.href; return <Link key={child.href} href={child.href} className={`rounded-lg px-3 py-2 text-xs font-bold ${childActive ? "bg-[#f3e4dc] text-[#8f4e36]" : "text-[#655d59] hover:bg-[#eae3dc]"}`}>{child.label}</Link>; })}</div>}
+              {item.children && expanded === item.href.slice(1) && <div className="ml-3 grid gap-1 border-l border-[#dfd4cb] pl-2">{item.children.map((child) => { const childActive = pathname === child.href; return <Link key={child.href} href={child.href} className={`rounded-lg px-3 py-2 text-xs font-bold ${childActive ? "bg-[#f3e4dc] text-[#8f4e36]" : "text-[#655d59] hover:bg-[#eae3dc]"}`}>{child.label}</Link>; })}</div>}
               </Fragment>
             );
           })}
