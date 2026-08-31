@@ -22,5 +22,5 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
     errorMessage = error instanceof Error ? error.message : "잠시 후 다시 시도해 주세요.";
   }
   if (result) return <>{header}<ListingPropertySwitcher selected={type} /><ListingWorkspace context={result.context} filters={result.filters} listings={result.listings} consultationId={consultationId} /></>;
-  return <>{header}<ListingPropertySwitcher selected={type} /><ListingWorkspace context={{ kind: "no-active-membership" }} filters={{ query: "", status: "active", transaction: "all", availability: "all", minDeposit: "", maxDeposit: "", holdingSource: "", photo: "all", confirmedBefore: "" }} listings={[]} errorMessage={errorMessage} /></>;
+  return <>{header}<ListingPropertySwitcher selected={type} /><ListingWorkspace context={{ kind: "no-active-membership" }} filters={{ query: "", scope: "current", status: "all", propertyType: "all", transaction: "all", availability: "all", receivedStart: "", receivedEnd: "", minDeposit: "", maxDeposit: "", minMonthlyRent: "", maxMonthlyRent: "", holdingSource: "" }} listings={[]} errorMessage={errorMessage} /></>;
 }

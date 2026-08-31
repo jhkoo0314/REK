@@ -27,8 +27,6 @@ export const listingCreateSchema = z.object({
   availabilityType: z.enum(["immediate", "date_specified", "needs_confirmation"]),
   availableDate: z.string(),
   moveOutDate: z.string(),
-  photoStatus: z.enum(["not_available", "available", "needs_confirmation"]),
-  lastConfirmedDate: z.string(),
   holdingSource: z.string().trim(),
 }).superRefine((values, context) => {
   if (values.buildingMode === "existing" && !values.buildingId) context.addIssue({ code: "custom", path: ["buildingId"], message: "기존 건물을 선택해 주세요." });

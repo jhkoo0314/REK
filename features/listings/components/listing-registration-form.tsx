@@ -5,6 +5,7 @@ import { BuildingSearchPicker } from "@/features/listings/components/building-se
 import { listingCreateSchema, type ListingCreateInput } from "@/features/listings/schemas/listing-create";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatPhoneNumber } from "@/lib/phone-format";
+import { customHoldingSourceValue, holdingSourcePresets, isHoldingSourcePreset } from "@/features/listings/holding-sources";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useForm, useWatch, type UseFormRegisterReturn } from "react-hook-form";
@@ -13,7 +14,7 @@ const emptyValues: ListingCreateInput = {
   buildingMode: "new", buildingId: "", buildingName: "", lotAddress: "",
   unitMode: "new", unitId: "", unitNumber: "", floor: "", layoutType: "", direction: "", elevatorOption: "", accessPassword: "", ownerPhone: "", tenantPhone: "",
   propertyType: "one_room", listingStatus: "vacant", transactionType: "monthly_rent", depositAmount: "", monthlyRentAmount: "", maintenanceFeeAmount: "",
-  availabilityType: "immediate", availableDate: "", moveOutDate: "", photoStatus: "not_available", lastConfirmedDate: "", holdingSource: "",
+  availabilityType: "immediate", availableDate: "", moveOutDate: "", holdingSource: "",
 };
 
 function inferFloorFromUnitNumber(value: string) {
@@ -24,12 +25,13 @@ function inferFloorFromUnitNumber(value: string) {
 
 export function ListingRegistrationForm({ options }: { options: ListingRegistrationOptions }) {
   const [successNumber, setSuccessNumber] = useState<number | null>(null);
-  const form = useForm<ListingCreateInput>({ resolver: zodResolver(listingCreateSchema), defaultValues: emptyValues });
+  const form = useForm<ListingCreateInput>({ resolver: zodResolver(listingCreateSchema), defaultValues: options.initialValues ?? emptyValues });
   const buildingMode = useWatch({ control: form.control, name: "buildingMode" });
   const unitMode = useWatch({ control: form.control, name: "unitMode" });
   const buildingId = useWatch({ control: form.control, name: "buildingId" });
   const transactionType = useWatch({ control: form.control, name: "transactionType" });
   const availabilityType = useWatch({ control: form.control, name: "availabilityType" });
+  const holdingSource = useWatch({ control: form.control, name: "holdingSource" });
   const availableUnits = useMemo(() => options.units.filter((unit) => unit.buildingId === buildingId), [buildingId, options.units]);
   const unitNumberField = form.register("unitNumber");
 
@@ -48,6 +50,7 @@ export function ListingRegistrationForm({ options }: { options: ListingRegistrat
   }
 
   return <form className="mx-auto max-w-5xl space-y-5" onSubmit={form.handleSubmit(submit)}>
+    {options.initialValues && <div className="rounded-xl border border-[#c9d7c3] bg-[#f5faf2] px-4 py-3 text-sm text-[#49613e]"><b>기존 매물 내용을 불러왔습니다.</b> 가격·입주 조건 등을 확인해 수정한 뒤 새 공실 매물로 등록해 주세요. 이전 계약 완료 매물은 그대로 이력으로 보관됩니다.</div>}
     <section className="rounded-xl border border-[#e5e1db] bg-white">
       <SectionHeader title="1. 건물 선택" description="기존 건물을 선택하거나, 새 건물과 지번 주소를 함께 등록합니다." />
       <div className="p-5">
@@ -69,7 +72,7 @@ export function ListingRegistrationForm({ options }: { options: ListingRegistrat
       <SectionHeader title="3. 현재 매물 조건" description="가격과 상태는 새 매물에 저장됩니다. 같은 호실의 현재 매물은 한 건만 만들 수 있습니다." />
       <div className="grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-3"><label><span className="label">방 구조</span><select className="field" {...form.register("propertyType")}><option value="one_room">원룸</option><option value="two_room">투룸</option><option value="two_bay">투베이</option><option value="three_room">쓰리룸</option><option value="owner_unit">주인세대</option></select></label><label><span className="label">매물 상태</span><select className="field" {...form.register("listingStatus")}><option value="vacant">공실</option><option value="contract_in_progress">계약 진행</option><option value="on_hold">보류</option></select></label><label><span className="label">거래 방식</span><select className="field" {...form.register("transactionType")}><option value="monthly_rent">월세</option><option value="jeonse">전세</option><option value="sale">매매</option><option value="to_be_confirmed">확인 필요</option></select></label>
         <label><span className="label">{transactionType === "sale" ? "매매가" : "보증금"} (만원)</span><input className="field" inputMode="numeric" placeholder={transactionType === "jeonse" || transactionType === "sale" ? "필수" : "선택 입력"} {...form.register("depositAmount")} /><FieldError message={form.formState.errors.depositAmount?.message} /></label><label><span className="label">월세 (만원)</span><input className="field" inputMode="numeric" disabled={transactionType === "jeonse" || transactionType === "sale"} placeholder={transactionType === "monthly_rent" ? "필수" : transactionType === "sale" ? "매매는 비움" : "전세는 비움"} {...form.register("monthlyRentAmount")} /><FieldError message={form.formState.errors.monthlyRentAmount?.message} /></label><label><span className="label">관리비 (만원)</span><input className="field" inputMode="numeric" placeholder="선택 입력" {...form.register("maintenanceFeeAmount")} /></label><label><span className="label">입주 가능 조건</span><select className="field" {...form.register("availabilityType")}><option value="immediate">즉시 가능</option><option value="date_specified">퇴실 후 협의</option><option value="needs_confirmation">확인 필요</option></select></label>
-        {availabilityType === "date_specified" && <label><span className="label">입주 가능일</span><input className="field" type="date" {...form.register("availableDate")} /><FieldError message={form.formState.errors.availableDate?.message} /></label>}<label><span className="label">퇴실 예정일</span><input className="field" type="date" {...form.register("moveOutDate")} /></label><label className="md:col-span-2 xl:col-span-3"><span className="label">보유처</span><input className="field" placeholder="예: 개인매물, 주택관리" {...form.register("holdingSource")} /></label></div>
+        {availabilityType === "date_specified" && <label><span className="label">입주 가능일</span><input className="field" type="date" {...form.register("availableDate")} /><FieldError message={form.formState.errors.availableDate?.message} /></label>}<label><span className="label">퇴실 예정일</span><input className="field" type="date" {...form.register("moveOutDate")} /></label><label><span className="label">보유처</span><select className="field" value={isHoldingSourcePreset(holdingSource) ? holdingSource : holdingSource ? customHoldingSourceValue : ""} onChange={(event) => form.setValue("holdingSource", event.target.value === customHoldingSourceValue ? "" : event.target.value, { shouldDirty: true })}><option value="">선택 안 함</option>{holdingSourcePresets.map((source) => <option key={source} value={source}>{source}</option>)}<option value={customHoldingSourceValue}>{customHoldingSourceValue}</option></select></label>{(!holdingSource || !isHoldingSourcePreset(holdingSource)) && <label className="md:col-span-2 xl:col-span-2"><span className="label">보유처 직접입력</span><input className="field" placeholder="예: 지역 관리업체" {...form.register("holdingSource")} /></label>}</div>
     </section>
 
     {form.formState.errors.root?.message && <div role="alert" className="rounded-lg border border-[#e4b9ad] bg-[#fff4f1] px-4 py-3 text-sm text-[#9c4437]">{form.formState.errors.root.message}</div>}
@@ -80,7 +83,10 @@ export function ListingRegistrationForm({ options }: { options: ListingRegistrat
 
 function SectionHeader({ title, description }: { title: string; description: string }) { return <div className="border-b border-[#e5e1db] px-5 py-4"><h2 className="text-base font-extrabold">{title}</h2><p className="mt-1 text-xs text-[#7b7470]">{description}</p></div>; }
 function FieldError({ message }: { message?: string }) { return message ? <span className="mt-1 block text-xs text-[#b94a42]">{message}</span> : null; }
-function AccessPasswordField({ register }: { register: UseFormRegisterReturn<"accessPassword"> }) { return <label className="block"><span className="label">세대 비밀번호 <em className="not-italic text-[#a85f43]">(제한 정보)</em></span><input className="field" autoComplete="new-password" placeholder="필요한 경우에만 입력" type="password" {...register} /><span className="mt-1 block text-[11px] text-[#7b7470]">목록과 일반 상세에는 표시하지 않습니다.</span></label>; }
+function AccessPasswordField({ register }: { register: UseFormRegisterReturn<"accessPassword"> }) {
+  const [visible, setVisible] = useState(false);
+  return <label className="block"><span className="label">세대 비밀번호 <em className="not-italic text-[#a85f43]">(제한 정보)</em></span><div className="relative"><input className="field pr-14" autoComplete="new-password" placeholder="필요한 경우에만 입력" type={visible ? "text" : "password"} {...register} /><button className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] font-bold text-[#655f59]" onClick={() => setVisible((value) => !value)} type="button">{visible ? "숨기기" : "보기"}</button></div><span className="mt-1 block text-[11px] text-[#7b7470]">목록과 일반 상세에는 표시하지 않습니다.</span></label>;
+}
 function OwnerPhoneField({ form }: { form: ReturnType<typeof useForm<ListingCreateInput>> }) { return <label className="block"><span className="label">임대인 연락처 <em className="not-italic text-[#a85f43]">(건물 제한 정보)</em></span><input className="field" inputMode="tel" placeholder="010-1234-5678" type="tel" {...form.register("ownerPhone", { onChange: (event) => { event.target.value = formatPhoneNumber(event.target.value); } })} /><FieldError message={form.formState.errors.ownerPhone?.message} /></label>; }
 function TenantPhoneField({ form }: { form: ReturnType<typeof useForm<ListingCreateInput>> }) { return <label className="block"><span className="label">세입자 번호 <em className="not-italic text-[#a85f43]">(호실 제한 정보)</em></span><input className="field" inputMode="tel" placeholder="010-1234-5678" type="tel" {...form.register("tenantPhone", { onChange: (event) => { event.target.value = formatPhoneNumber(event.target.value); } })} /><FieldError message={form.formState.errors.tenantPhone?.message} /></label>; }
 function ModeButtons({ value, onExisting, onNew, existingLabel, newLabel, disabled = false }: { value: "existing" | "new"; onExisting: () => void; onNew: () => void; existingLabel: string; newLabel: string; disabled?: boolean }) { return <div className="flex flex-wrap gap-2"><button className={`rounded-lg border px-4 py-2 text-xs font-bold ${value === "existing" ? "border-[#3e3a37] bg-[#3e3a37] text-white" : "border-[#e5e1db] text-[#655f59]"}`} disabled={disabled} onClick={onExisting} type="button">{existingLabel}</button><button className={`rounded-lg border px-4 py-2 text-xs font-bold ${value === "new" ? "border-[#3e3a37] bg-[#3e3a37] text-white" : "border-[#e5e1db] text-[#655f59]"}`} onClick={onNew} type="button">{newLabel}</button></div>; }

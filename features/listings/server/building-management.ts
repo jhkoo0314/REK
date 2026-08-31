@@ -8,7 +8,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { normalizeForMatch, normalizeUnitNumber } from "@/lib/text-normalize";
 import { revalidatePath } from "next/cache";
 
-export type BuildingHistoryItem = { id: string; referenceNumber: number; status: ListingStatus; propertyType: string; isCurrent: boolean; updatedAt: string; endReason: ListingEndReason | null };
+export type BuildingHistoryItem = { id: string; referenceNumber: number; status: ListingStatus; propertyType: string; isCurrent: boolean; updatedAt: string; endReason: ListingEndReason | null; endDate: string | null };
 export type ManagedUnit = { id: string; buildingId: string; unitNumber: string; floor: number | null; direction: string | null; options: string[]; accessPassword: string; tenantPhone: string; history: BuildingHistoryItem[] };
 export type ManagedBuilding = { id: string; name: string; roadAddress: string | null; lotAddress: string | null; addressDetail: string | null; postalCode: string | null; ownerPhone: string; units: ManagedUnit[] };
 export type BuildingManagementData = { context: Awaited<ReturnType<typeof getOrganizationContext>>; buildings: ManagedBuilding[]; restrictedContactsAvailable: boolean; sensitiveAccess: SensitiveAccess };
@@ -22,7 +22,7 @@ export async function getBuildingManagementData(): Promise<BuildingManagementDat
   const [buildingResult, unitResult, listingResult, ownerResult, tenantResult, accessResult] = await Promise.all([
     supabase.from("buildings").select("id, name, road_address, lot_address, address_detail, postal_code").eq("organization_id", context.organizationId).order("name"),
     supabase.from("units").select("id, building_id, unit_number, floor, direction, options").eq("organization_id", context.organizationId).order("unit_number"),
-    supabase.from("listings").select("id, unit_id, listing_reference_number, listing_status, property_type, is_current, updated_at, end_reason").eq("organization_id", context.organizationId).order("listing_reference_number", { ascending: false }),
+    supabase.from("listings").select("id, unit_id, listing_reference_number, listing_status, property_type, is_current, updated_at, end_reason, end_date").eq("organization_id", context.organizationId).order("listing_reference_number", { ascending: false }),
     supabase.from("building_contacts").select("building_id, phone_number").eq("organization_id", context.organizationId).eq("contact_role", "owner"),
     supabase.from("unit_contacts").select("unit_id, phone_number").eq("organization_id", context.organizationId).eq("contact_role", "tenant"),
     supabase.from("unit_access_details").select("unit_id, access_password").eq("organization_id", context.organizationId),
@@ -34,7 +34,7 @@ export async function getBuildingManagementData(): Promise<BuildingManagementDat
   const historyByUnit = new Map<string, BuildingHistoryItem[]>();
   for (const item of listingResult.data ?? []) {
     const history = historyByUnit.get(item.unit_id) ?? [];
-    history.push({ id: item.id, referenceNumber: item.listing_reference_number, status: item.listing_status as ListingStatus, propertyType: item.property_type, isCurrent: item.is_current, updatedAt: item.updated_at, endReason: item.end_reason as ListingEndReason | null });
+    history.push({ id: item.id, referenceNumber: item.listing_reference_number, status: item.listing_status as ListingStatus, propertyType: item.property_type, isCurrent: item.is_current, updatedAt: item.updated_at, endReason: item.end_reason as ListingEndReason | null, endDate: item.end_date });
     historyByUnit.set(item.unit_id, history);
   }
   const unitsByBuilding = new Map<string, ManagedUnit[]>();

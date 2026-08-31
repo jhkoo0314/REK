@@ -16,8 +16,6 @@ export const listingUpdateSchema = z.object({
   availabilityType: z.enum(["immediate", "date_specified", "needs_confirmation"]),
   availableDate: z.string(),
   moveOutDate: z.string(),
-  photoStatus: z.enum(["not_available", "available", "needs_confirmation"]),
-  lastConfirmedDate: z.string(),
   holdingSource: z.string().trim(),
 }).superRefine((values, context) => {
   if (values.transactionType === "monthly_rent" && !values.monthlyRentAmount) context.addIssue({ code: "custom", path: ["monthlyRentAmount"], message: "월세를 입력해 주세요." });

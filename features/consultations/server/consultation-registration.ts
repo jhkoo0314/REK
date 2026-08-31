@@ -31,8 +31,15 @@ export type StoredConsultationDetail = {
 export type StoredConsultationFollowup = { id: string; followupDate: string; followupMethod: string; progressStage: string | null; visitResult: string | null; closedReason: string | null; nextContactDate: string | null; note: string | null };
 export type ConsultationListItem = {
   id: string; referenceNumber: number | null; customerName: string; customerPhone: string; category: "general" | "listing"; inflowSource: string; consultationDate: string; status: string; progressStage: string; nextContactDate: string | null; closedReason: string | null; initialListingLabel: string | null; latestFollowupDate: string | null; latestFollowupMethod: string | null;
-  desiredAreas: string[]; desiredAreasOther: string | null; desiredRoomTypes: string[]; desiredRoomTypesOther: string | null; desiredDepositBudget: number | null; desiredMonthlyRentBudget: number | null;
+  desiredAreas: string[]; desiredAreasOther: string | null; desiredRoomTypes: string[]; desiredRoomTypesOther: string | null; desiredDepositBudget: number | null; desiredMonthlyRentBudget: number | null; focusLevel: "24시간 경과" | "72시간 경과" | null;
 };
+
+function consultationFocusLevel(consultationDate: string, status: string): ConsultationListItem["focusLevel"] {
+  if (status !== "in_progress") return null;
+  const today = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Seoul" }).format(new Date());
+  const elapsedDays = Math.floor((Date.parse(`${today}T00:00:00Z`) - Date.parse(`${consultationDate}T00:00:00Z`)) / 86_400_000);
+  return elapsedDays >= 3 ? "72시간 경과" : elapsedDays >= 1 ? "24시간 경과" : null;
+}
 
 export async function getConsultationRegistrationOptions(): Promise<ConsultationRegistrationOptions> {
   const context = await getOrganizationContext();
@@ -100,7 +107,7 @@ export async function getConsultationList(): Promise<{ context: Awaited<ReturnTy
     return [listing.id, `M-${String(listing.listing_reference_number ?? "").padStart(6, "0")} · ${building?.name ?? "건물"} ${unit?.unit_number ?? "호실"}`];
   }));
   return { context, consultations: (data ?? []).map((item) => ({
-    id: item.id, referenceNumber: item.consultation_reference_number, customerName: item.customer_name ?? "이름 미입력", customerPhone: sensitiveAccess.consultationContacts ? item.customer_phone : "", category: item.category, inflowSource: item.inflow_source, consultationDate: item.consultation_date, status: item.status, progressStage: item.progress_stage, nextContactDate: item.next_contact_date, closedReason: item.closed_reason, initialListingLabel: item.initial_listing_id ? listingLabelById.get(item.initial_listing_id) ?? "연결 매물 확인 필요" : null, latestFollowupDate: item.latest_followup_date, latestFollowupMethod: item.latest_followup_method,
+    id: item.id, referenceNumber: item.consultation_reference_number, customerName: item.customer_name ?? "이름 미입력", customerPhone: sensitiveAccess.consultationContacts ? item.customer_phone : "", category: item.category, inflowSource: item.inflow_source, consultationDate: item.consultation_date, status: item.status, progressStage: item.progress_stage, nextContactDate: item.next_contact_date, closedReason: item.closed_reason, initialListingLabel: item.initial_listing_id ? listingLabelById.get(item.initial_listing_id) ?? "연결 매물 확인 필요" : null, latestFollowupDate: item.latest_followup_date, latestFollowupMethod: item.latest_followup_method, focusLevel: consultationFocusLevel(item.consultation_date, item.status),
     desiredAreas: item.desired_areas ?? [], desiredAreasOther: item.desired_areas_other, desiredRoomTypes: item.desired_room_types ?? [], desiredRoomTypesOther: item.desired_room_types_other, desiredDepositBudget: item.desired_deposit_budget, desiredMonthlyRentBudget: item.desired_monthly_rent_budget,
   })) };
 }

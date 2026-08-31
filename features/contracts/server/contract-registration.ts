@@ -7,21 +7,21 @@ import { getSensitiveAccess } from "@/lib/auth/sensitive-access";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
-export type ContractOption = { id: string; label: string; transactionType?: "monthly_rent" | "jeonse" | "sale" | "to_be_confirmed" };
+export type ContractOption = { id: string; label: string; searchText?: string; transactionType?: "monthly_rent" | "jeonse" | "sale" | "to_be_confirmed"; isCurrent?: boolean };
 export type ContractListItem = { id: string; referenceNumber: number; status: string; listingLabel: string; sourceLabel: string | null; officialContractDate: string | null; moveInDate: string | null; endDate: string | null; balanceDueDate: string | null };
 export type ContractSaveResult = { ok: true; contractId: string } | { ok: false; message: string; fieldErrors?: Record<string, string[]> };
 
-function labelForListing(item: any) { const unit = Array.isArray(item.units) ? item.units[0] : item.units; const building = Array.isArray(unit?.buildings) ? unit.buildings[0] : unit?.buildings; return `M-${String(item.listing_reference_number).padStart(6, "0")} · ${building?.name ?? "건물"} ${unit?.unit_number ?? "호실"}`; }
+function labelForListing(item: any) { const unit = Array.isArray(item.units) ? item.units[0] : item.units; const building = Array.isArray(unit?.buildings) ? unit.buildings[0] : unit?.buildings; return `M-${String(item.listing_reference_number).padStart(6, "0")} · ${building?.name ?? "건물"} · ${unit?.unit_number ?? "호실"} · ${item.is_current ? "현재 매물" : "과거 이력"}`; }
 
 export async function getContractRegistrationOptions() {
   const context = await getOrganizationContext();
   if (context.kind !== "ready") return { context, listings: [] as ContractOption[], consultations: [] as ContractOption[] };
   const sensitiveAccess = await getSensitiveAccess(context);
   const supabase = createSupabaseServerClient();
-  const { data: listings, error: listingError } = await supabase.from("listings").select("id, listing_reference_number, transaction_type, units!inner(unit_number, buildings!inner(name))").eq("organization_id", context.organizationId).eq("is_current", true).order("listing_reference_number", { ascending: false });
+  const { data: listings, error: listingError } = await supabase.from("listings").select("id, listing_reference_number, transaction_type, listing_status, is_current, units!inner(unit_number, buildings!inner(name, lot_address, road_address))").eq("organization_id", context.organizationId).order("listing_reference_number", { ascending: false }).limit(200);
   const { data: consultations, error: consultationError } = await supabase.from("consultations").select("id, consultation_reference_number, customer_name, customer_phone").eq("organization_id", context.organizationId).order("consultation_date", { ascending: false });
   if (listingError || consultationError) throw new Error("계약 등록에 필요한 매물 또는 상담 정보를 불러오지 못했습니다. P1 migration 적용 상태를 확인해 주세요.");
-  return { context, listings: (listings ?? []).map((item) => ({ id: item.id, label: labelForListing(item), transactionType: item.transaction_type })), consultations: (consultations ?? []).map((item) => ({ id: item.id, label: `S-${String(item.consultation_reference_number).padStart(6, "0")} · ${item.customer_name ?? "이름 미입력"}${sensitiveAccess.consultationContacts ? ` · ${item.customer_phone}` : ""}` })) };
+  return { context, listings: (listings ?? []).map((item) => { const unit = Array.isArray(item.units) ? item.units[0] : item.units; const building = Array.isArray(unit?.buildings) ? unit?.buildings[0] : unit?.buildings; return { id: item.id, label: labelForListing(item), searchText: `M-${String(item.listing_reference_number).padStart(6, "0")} ${building?.name ?? ""} ${building?.lot_address ?? ""} ${building?.road_address ?? ""} ${unit?.unit_number ?? ""} ${item.listing_status}`, transactionType: item.transaction_type, isCurrent: item.is_current }; }), consultations: (consultations ?? []).map((item) => ({ id: item.id, label: `S-${String(item.consultation_reference_number).padStart(6, "0")} · ${item.customer_name ?? "이름 미입력"}${sensitiveAccess.consultationContacts ? ` · ${item.customer_phone}` : ""}` })) };
 }
 
 export async function getContractList() {
@@ -41,7 +41,7 @@ export async function createContract(values: ContractCreateInput): Promise<Contr
   const parsed = contractCreateSchema.safeParse(values); if (!parsed.success) return { ok: false, message: "계약 입력 내용을 확인해 주세요.", fieldErrors: parsed.error.flatten().fieldErrors };
   const context = await getOrganizationContext(); if (context.kind !== "ready") return { ok: false, message: "활성 조직 멤버십을 확인할 수 없습니다." };
   const value = parsed.data; const supabase = createSupabaseServerClient();
-  const { data: listing } = await supabase.from("listings").select("id").eq("id", value.listingId).eq("organization_id", context.organizationId).eq("is_current", true).maybeSingle(); if (!listing) return { ok: false, message: "현재 조직의 현재 매물만 실제 계약 매물로 선택할 수 있습니다." };
+  const { data: listing } = await supabase.from("listings").select("id").eq("id", value.listingId).eq("organization_id", context.organizationId).maybeSingle(); if (!listing) return { ok: false, message: "현재 조직의 매물 기록만 실제 계약 매물로 선택할 수 있습니다." };
   if (value.sourceConsultationId) { const { data: consultation } = await supabase.from("consultations").select("id").eq("id", value.sourceConsultationId).eq("organization_id", context.organizationId).maybeSingle(); if (!consultation) return { ok: false, message: "선택한 출처 상담을 찾을 수 없습니다." }; }
   const { data, error } = await supabase.from("contracts").insert({ organization_id: context.organizationId, listing_id: value.listingId, source_consultation_id: value.sourceConsultationId || null, contract_type: value.contractKind === "renewal" ? "renewal" : value.transactionType === "sale" ? "sale" : "rental", transaction_type: value.transactionType, contract_kind: value.contractKind, brokerage_type: value.brokerageType, contract_started_date: value.contractStartedDate || null, official_contract_date: value.officialContractDate || null, move_in_date: value.moveInDate || null, end_date: value.endDate || null, total_contract_deposit_amount: value.totalContractDepositAmount ? Number(value.totalContractDepositAmount) : null, provisional_deposit_amount: value.provisionalDepositAmount ? Number(value.provisionalDepositAmount) : null, additional_deposit_due_date: value.additionalDepositDueDate || null, balance_amount: value.balanceAmount ? Number(value.balanceAmount) : null, balance_due_date: value.balanceDueDate || null, note: value.note || null, created_by_clerk_user_id: context.clerkUserId, updated_by_clerk_user_id: context.clerkUserId }).select("id").single();
   if (error || !data) return { ok: false, message: `계약을 저장하지 못했습니다. (${error?.code ?? "원인 미확인"}) ${error?.message ?? "20260826001600 migration 적용 상태를 확인해 주세요."}` };

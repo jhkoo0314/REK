@@ -13,9 +13,9 @@ import { revalidatePath } from "next/cache";
 type BuildingOption = { id: string; name: string; address: string };
 type UnitOption = { id: string; buildingId: string; unitNumber: string; layoutType: string | null };
 
-export type ListingRegistrationOptions = { context: Awaited<ReturnType<typeof getOrganizationContext>>; buildings: BuildingOption[]; units: UnitOption[]; sensitiveAccess: { propertyContacts: boolean; unitAccess: boolean } };
+export type ListingRegistrationOptions = { context: Awaited<ReturnType<typeof getOrganizationContext>>; buildings: BuildingOption[]; units: UnitOption[]; sensitiveAccess: { propertyContacts: boolean; unitAccess: boolean }; initialValues?: ListingCreateInput };
 
-export async function getListingRegistrationOptions(): Promise<ListingRegistrationOptions> {
+export async function getListingRegistrationOptions(unitId?: string): Promise<ListingRegistrationOptions> {
   const context = await getOrganizationContext();
   if (context.kind !== "ready") return { context, buildings: [], units: [], sensitiveAccess: { propertyContacts: false, unitAccess: false } };
   const sensitiveAccess = await getSensitiveAccess(context);
@@ -27,11 +27,34 @@ export async function getListingRegistrationOptions(): Promise<ListingRegistrati
   ]);
 
   if (buildingError || unitError) throw new Error("건물·호실 선택 정보를 불러오지 못했습니다.");
+  const selectedUnit = unitId ? (units ?? []).find((unit) => unit.id === unitId) : undefined;
+  let initialValues: ListingCreateInput | undefined;
+  if (selectedUnit) {
+    const { data: previousListing, error: previousListingError } = await supabase
+      .from("listings")
+      .select("property_type, listing_status, is_current, transaction_type, deposit_amount, monthly_rent_amount, maintenance_fee_amount, availability_type, available_date, move_out_date, holding_source")
+      .eq("organization_id", context.organizationId)
+      .eq("unit_id", selectedUnit.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (previousListingError) throw new Error("이전 매물 정보를 불러오지 못했습니다.");
+    if (previousListing && !previousListing.is_current) {
+      initialValues = {
+        buildingMode: "existing", buildingId: selectedUnit.building_id, buildingName: "", lotAddress: "",
+        unitMode: "existing", unitId: selectedUnit.id, unitNumber: "", floor: "", layoutType: selectedUnit.layout_type ?? "", direction: "", elevatorOption: "", accessPassword: "", ownerPhone: "", tenantPhone: "",
+        propertyType: previousListing.property_type, listingStatus: "vacant", transactionType: previousListing.transaction_type,
+        depositAmount: previousListing.deposit_amount?.toString() ?? "", monthlyRentAmount: previousListing.monthly_rent_amount?.toString() ?? "", maintenanceFeeAmount: previousListing.maintenance_fee_amount?.toString() ?? "",
+        availabilityType: previousListing.availability_type, availableDate: previousListing.available_date ?? "", moveOutDate: previousListing.move_out_date ?? "", holdingSource: previousListing.holding_source ?? "",
+      };
+    }
+  }
   return {
     context,
     sensitiveAccess: { propertyContacts: sensitiveAccess.propertyContacts, unitAccess: sensitiveAccess.unitAccess },
     buildings: (buildings ?? []).map((building) => ({ id: building.id, name: building.name, address: building.road_address ?? building.lot_address ?? "주소 미입력" })),
     units: (units ?? []).map((unit) => ({ id: unit.id, buildingId: unit.building_id, unitNumber: unit.unit_number, layoutType: unit.layout_type })),
+    initialValues,
   };
 }
 
@@ -64,8 +87,6 @@ function toPayload(values: ListingCreateInput) {
     availabilityType: values.availabilityType,
     availableDate: values.availabilityType === "date_specified" ? values.availableDate : "",
     moveOutDate: values.moveOutDate,
-    photoStatus: values.photoStatus,
-    lastConfirmedDate: values.lastConfirmedDate,
     holdingSource: values.holdingSource,
   };
 }
@@ -159,7 +180,7 @@ export async function retireListing(values: ListingRetireInput): Promise<Listing
   const context = await getOrganizationContext();
   if (context.kind !== "ready") return { ok: false, message: "활성 조직 멤버십을 확인할 수 없습니다." };
   const supabase = createSupabaseServerClient();
-  const { data, error } = await supabase.from("listings").update({ listing_status: "ended", is_current: false, end_reason: parsed.data.endReason, updated_by_clerk_user_id: context.clerkUserId }).eq("id", parsed.data.id).eq("organization_id", context.organizationId).eq("is_current", true).select("id").maybeSingle();
+  const { data, error } = await supabase.from("listings").update({ listing_status: "ended", is_current: false, end_reason: parsed.data.endReason, end_date: parsed.data.endDate, updated_by_clerk_user_id: context.clerkUserId }).eq("id", parsed.data.id).eq("organization_id", context.organizationId).eq("is_current", true).select("id").maybeSingle();
   if (error || !data) return { ok: false, message: "종료할 현재 매물을 찾지 못했거나 저장에 실패했습니다." };
   revalidatePath("/listings"); revalidatePath("/buildings"); revalidatePath(`/listings/${parsed.data.id}`); revalidatePath(`/listings/${parsed.data.id}/history`);
   return { ok: true };
@@ -172,9 +193,13 @@ export async function quickUpdateListing(values: ListingQuickUpdateInput): Promi
   if (context.kind !== "ready") return { ok: false, message: "활성 조직 멤버십을 확인할 수 없습니다." };
   const value = parsed.data;
   const supabase = createSupabaseServerClient();
+  const { data: current } = await supabase.from("listings").select("listing_status").eq("id", value.id).eq("organization_id", context.organizationId).eq("is_current", true).maybeSingle();
+  if (!current) return { ok: false, message: "수정할 현재 매물을 찾지 못했습니다." };
+  if (!["vacant", "on_hold"].includes(value.listingStatus) && current.listing_status !== value.listingStatus) return { ok: false, message: "계약 상태는 계약관리에서만 변경할 수 있습니다." };
+  if (["contract_in_progress", "contract_complete"].includes(current.listing_status) && current.listing_status !== value.listingStatus) return { ok: false, message: "계약 상태는 계약관리에서만 변경할 수 있습니다." };
   const { data, error } = await supabase
     .from("listings")
-    .update({ listing_status: value.listingStatus, is_current: value.listingStatus !== "contract_complete", photo_status: value.photoStatus, last_confirmed_date: value.lastConfirmedDate || null, holding_source: value.holdingSource || null, updated_by_clerk_user_id: context.clerkUserId })
+    .update({ listing_status: value.listingStatus, holding_source: value.holdingSource || null, updated_by_clerk_user_id: context.clerkUserId })
     .eq("id", value.id)
     .eq("organization_id", context.organizationId)
     .eq("is_current", true)
@@ -186,7 +211,7 @@ export async function quickUpdateListing(values: ListingQuickUpdateInput): Promi
   revalidatePath(`/listings/${value.id}/edit`);
   revalidatePath(`/listings/${value.id}/history`);
   revalidatePath("/buildings");
-  return { ok: true, movedToHistory: value.listingStatus === "contract_complete" };
+  return { ok: true, movedToHistory: false };
 }
 
 export async function getListingAccessPassword(listingId: string): Promise<ListingAccessPasswordResult> {
@@ -226,12 +251,16 @@ export async function updateListing(values: ListingUpdateInput): Promise<Listing
 
   const value = parsed.data;
   const supabase = createSupabaseServerClient();
+  const { data: current } = await supabase.from("listings").select("listing_status").eq("id", value.id).eq("organization_id", context.organizationId).eq("is_current", true).maybeSingle();
+  if (!current) return { ok: false, message: "수정할 현재 매물을 찾지 못했습니다." };
+  if (!["vacant", "on_hold"].includes(value.listingStatus) && current.listing_status !== value.listingStatus) return { ok: false, message: "계약 상태는 계약관리에서만 변경할 수 있습니다." };
+  if (["contract_in_progress", "contract_complete"].includes(current.listing_status) && current.listing_status !== value.listingStatus) return { ok: false, message: "계약 상태는 계약관리에서만 변경할 수 있습니다." };
+  if (!["vacant", "on_hold"].includes(current.listing_status) && current.listing_status !== value.listingStatus) return { ok: false, message: "계약 상태는 계약관리에서만 변경할 수 있습니다." };
   const { data, error } = await supabase
     .from("listings")
     .update({
       property_type: value.propertyType,
       listing_status: value.listingStatus,
-      is_current: value.listingStatus !== "contract_complete",
       transaction_type: value.transactionType,
       deposit_amount: value.depositAmount ? Number(value.depositAmount) : null,
       monthly_rent_amount: value.monthlyRentAmount ? Number(value.monthlyRentAmount) : null,
@@ -239,8 +268,6 @@ export async function updateListing(values: ListingUpdateInput): Promise<Listing
       availability_type: value.availabilityType,
       available_date: value.availabilityType === "date_specified" ? value.availableDate : null,
       move_out_date: value.moveOutDate || null,
-      photo_status: value.photoStatus,
-      last_confirmed_date: value.lastConfirmedDate || null,
       holding_source: value.holdingSource || null,
       updated_by_clerk_user_id: context.clerkUserId,
     })
@@ -271,5 +298,5 @@ export async function updateListing(values: ListingUpdateInput): Promise<Listing
   revalidatePath(`/listings/${value.id}/edit`);
   revalidatePath(`/listings/${value.id}/history`);
   revalidatePath("/buildings");
-  return { ok: true, movedToHistory: value.listingStatus === "contract_complete" };
+  return { ok: true, movedToHistory: false };
 }

@@ -3,8 +3,6 @@ import { z } from "zod";
 export const listingQuickUpdateSchema = z.object({
   id: z.string().uuid(),
   listingStatus: z.enum(["vacant", "contract_in_progress", "contract_complete", "on_hold"]),
-  photoStatus: z.enum(["not_available", "available", "needs_confirmation"]),
-  lastConfirmedDate: z.string(),
   holdingSource: z.string().trim(),
 });
 

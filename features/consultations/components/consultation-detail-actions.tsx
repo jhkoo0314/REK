@@ -16,8 +16,7 @@ function defaults(consultation: StoredConsultationDetail): ConsultationUpdateInp
   return { id: consultation.id, category: consultation.category, initialListingId: consultation.initialListingId ?? "", customerName: consultation.customerName === "이름 미입력" ? "" : consultation.customerName, customerPhone: consultation.customerPhone, consultationDate: consultation.consultationDate, inflowSource: consultation.inflowSource, consultationMethod: consultation.consultationMethod as ConsultationUpdateInput["consultationMethod"], consultationNote: consultation.consultationNote ?? "", desiredAreas: consultation.desiredAreas, desiredAreasOther: consultation.desiredAreasOther ?? "", desiredRoomTypes: consultation.desiredRoomTypes, desiredRoomTypesOther: consultation.desiredRoomTypesOther ?? "", desiredDepositBudget: consultation.desiredDepositBudget?.toString() ?? "", desiredMonthlyRentBudget: consultation.desiredMonthlyRentBudget?.toString() ?? "", desiredMoveInDate: consultation.desiredMoveInDate ?? "", requiredFeaturesNote: consultation.requiredFeaturesNote ?? "", status: consultation.status as ConsultationUpdateInput["status"], progressStage: consultation.progressStage as ConsultationUpdateInput["progressStage"], nextContactDate: consultation.nextContactDate ?? "", closedReason: consultation.closedReason ?? "" };
 }
 
-export function ConsultationDetailActions({ consultation, listingOptions }: { consultation: StoredConsultationDetail; listingOptions: ConsultationListingOption[] }) {
-  const [editing, setEditing] = useState(false);
+export function ConsultationDetailActions({ consultation }: { consultation: StoredConsultationDetail }) {
   const router = useRouter();
   async function remove() {
     const text = `상담과 후속 이력 ${consultation.followups.length}건이 삭제됩니다. 매물 원본은 삭제되지 않습니다. 계속할까요?`;
@@ -26,7 +25,13 @@ export function ConsultationDetailActions({ consultation, listingOptions }: { co
     if (!result.ok) { window.alert(result.message); return; }
     router.push("/consultations"); router.refresh();
   }
-  return <section className="space-y-3"><div className="flex flex-wrap gap-2"><button className="rounded-lg border border-[#3e3a37] px-3 py-2 text-xs font-bold text-[#3e3a37]" onClick={() => setEditing((value) => !value)} type="button">{editing ? "수정 닫기" : "상담 수정"}</button><button className="rounded-lg border border-[#e7c6bc] px-3 py-2 text-xs font-bold text-[#a85f43]" onClick={remove} type="button">상담 삭제</button></div>{editing && <ConsultationEditForm consultation={consultation} listingOptions={listingOptions} onDone={() => { setEditing(false); router.refresh(); }} />}</section>;
+  return <button className="rounded-lg border border-[#e7c6bc] px-3 py-2 text-xs font-bold text-[#a85f43]" onClick={remove} type="button">상담 삭제</button>;
+}
+
+export function ConsultationEditSection({ consultation, listingOptions }: { consultation: StoredConsultationDetail; listingOptions: ConsultationListingOption[] }) {
+  const [editing, setEditing] = useState(false);
+  const router = useRouter();
+  return <section className="border-t border-[#e5e1db] p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><h3 className="font-bold">상담 기본 정보</h3><p className="mt-1 text-xs text-[#77736e]">위의 기존 상담 내용을 확인한 뒤 필요한 항목만 수정합니다.</p></div><button className="rounded-lg border border-[#3e3a37] px-3 py-2 text-xs font-bold text-[#3e3a37]" onClick={() => setEditing((value) => !value)} type="button">{editing ? "수정 닫기" : "상담 수정"}</button></div>{editing && <div className="mt-4"><ConsultationEditForm consultation={consultation} listingOptions={listingOptions} onDone={() => { setEditing(false); router.refresh(); }} /></div>}</section>;
 }
 
 function ConsultationEditForm({ consultation, listingOptions, onDone }: { consultation: StoredConsultationDetail; listingOptions: ConsultationListingOption[]; onDone: () => void }) {

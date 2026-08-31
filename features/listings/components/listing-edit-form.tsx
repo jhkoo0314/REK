@@ -2,6 +2,7 @@
 
 import { updateListing } from "@/features/listings/server/listing-registration";
 import { listingUpdateSchema, type ListingUpdateInput } from "@/features/listings/schemas/listing-update";
+import { customHoldingSourceValue, holdingSourcePresets, isHoldingSourcePreset } from "@/features/listings/holding-sources";
 import type { ListingDetail, ListingEditData } from "@/features/listings/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -11,7 +12,7 @@ import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 function valuesFromListing(listing: ListingDetail, accessPassword: string, ownerPhone: string, tenantPhone: string): ListingUpdateInput {
-  return { id: listing.id, accessPassword, ownerPhone, tenantPhone, propertyType: listing.propertyType as ListingUpdateInput["propertyType"], listingStatus: listing.status as ListingUpdateInput["listingStatus"], transactionType: listing.transactionType, depositAmount: listing.depositAmount?.toString() ?? "", monthlyRentAmount: listing.monthlyRentAmount?.toString() ?? "", maintenanceFeeAmount: listing.maintenanceFeeAmount?.toString() ?? "", availabilityType: listing.availabilityType, availableDate: listing.availableDate ?? "", moveOutDate: listing.moveOutDate ?? "", photoStatus: listing.photoStatus, lastConfirmedDate: listing.lastConfirmedDate ?? "", holdingSource: listing.holdingSource ?? "" };
+  return { id: listing.id, accessPassword, ownerPhone, tenantPhone, propertyType: listing.propertyType as ListingUpdateInput["propertyType"], listingStatus: listing.status as ListingUpdateInput["listingStatus"], transactionType: listing.transactionType, depositAmount: listing.depositAmount?.toString() ?? "", monthlyRentAmount: listing.monthlyRentAmount?.toString() ?? "", maintenanceFeeAmount: listing.maintenanceFeeAmount?.toString() ?? "", availabilityType: listing.availabilityType, availableDate: listing.availableDate ?? "", moveOutDate: listing.moveOutDate ?? "", holdingSource: listing.holdingSource ?? "" };
 }
 
 export function ListingEditForm({ editData }: { editData: ListingEditData }) {
@@ -21,10 +22,10 @@ export function ListingEditForm({ editData }: { editData: ListingEditData }) {
   const form = useForm<ListingUpdateInput>({ resolver: zodResolver(listingUpdateSchema), defaultValues: valuesFromListing(listing, accessPassword, ownerPhone, tenantPhone) });
   const transactionType = useWatch({ control: form.control, name: "transactionType" });
   const availabilityType = useWatch({ control: form.control, name: "availabilityType" });
+  const holdingSource = useWatch({ control: form.control, name: "holdingSource" });
 
   async function submit(values: ListingUpdateInput) {
     setSaved(false);
-    if (values.listingStatus === "contract_complete" && !window.confirm("계약 완료로 저장하면 현재 재고에서 종료되고 과거 매물 이력으로 남습니다. 이후 같은 호실에 새 매물을 등록할 수 있습니다. 계속할까요?")) return;
     const result = await updateListing(values);
     if (!result.ok) {
       Object.entries(result.fieldErrors ?? {}).forEach(([name, messages]) => form.setError(name as keyof ListingUpdateInput, { message: messages[0] }));
@@ -40,7 +41,7 @@ export function ListingEditForm({ editData }: { editData: ListingEditData }) {
       <div className="border-b border-[#e5e1db] px-5 py-4"><p className="font-mono text-[11px] font-bold text-[#8b8279]">M-{String(listing.referenceNumber).padStart(6, "0")}</p><h2 className="mt-1 text-base font-extrabold">{listing.buildingName} {listing.unitNumber}</h2><p className="mt-1 text-xs text-[#7b7470]">건물·호실의 고정 정보는 건물·호실 관리에서 수정합니다.</p></div>
       <div className="grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-3">
         <Field label="방 구조"><select className="field" {...form.register("propertyType")}><option value="one_room">원룸</option><option value="two_room">투룸</option><option value="two_bay">투베이</option><option value="three_room">쓰리룸</option><option value="owner_unit">주인세대</option></select></Field>
-        <Field label="매물 상태"><select className="field" {...form.register("listingStatus")}><option value="vacant">공실</option><option value="contract_in_progress">계약 진행</option><option value="contract_complete">계약 완료</option><option value="on_hold">보류</option></select></Field>
+        {listing.status === "contract_in_progress" || listing.status === "contract_complete" ? <Field label="매물 상태"><p className="field bg-[#faf8f4]">{listing.status === "contract_in_progress" ? "계약 진행" : "계약 완료"}</p><span className="mt-1 block text-[11px] text-[#7b7470]">계약 진행·완료·해지·만료는 계약관리에서 처리합니다.</span></Field> : <Field label="매물 상태"><select className="field" {...form.register("listingStatus")}><option value="vacant">공실</option><option value="on_hold">보류</option></select><span className="mt-1 block text-[11px] text-[#7b7470]">계약 상태는 계약관리에서 처리합니다.</span></Field>}
         <Field label="거래 방식"><select className="field" {...form.register("transactionType")}><option value="monthly_rent">월세</option><option value="jeonse">전세</option><option value="sale">매매</option><option value="to_be_confirmed">확인 필요</option></select></Field>
         <Field label={`${transactionType === "sale" ? "매매가" : "보증금"} (만원)`} error={form.formState.errors.depositAmount?.message}><input className="field" inputMode="numeric" {...form.register("depositAmount")} /></Field>
         <Field label="월세 (만원)" error={form.formState.errors.monthlyRentAmount?.message}><input className="field" disabled={transactionType === "jeonse" || transactionType === "sale"} inputMode="numeric" {...form.register("monthlyRentAmount")} /></Field>
@@ -50,7 +51,8 @@ export function ListingEditForm({ editData }: { editData: ListingEditData }) {
         <Field label="퇴실 예정일"><input className="field" type="date" {...form.register("moveOutDate")} /></Field>
 
 
-        <label className="md:col-span-2 xl:col-span-3"><span className="label">보유처</span><input className="field" {...form.register("holdingSource")} /></label>
+        <Field label="보유처"><select className="field" value={isHoldingSourcePreset(holdingSource) ? holdingSource : holdingSource ? customHoldingSourceValue : ""} onChange={(event) => form.setValue("holdingSource", event.target.value === customHoldingSourceValue ? "" : event.target.value, { shouldDirty: true })}><option value="">선택 안 함</option>{holdingSourcePresets.map((source) => <option key={source} value={source}>{source}</option>)}<option value={customHoldingSourceValue}>{customHoldingSourceValue}</option></select></Field>
+        {(!holdingSource || !isHoldingSourcePreset(holdingSource)) && <Field label="보유처 직접입력"><input className="field" placeholder="예: 지역 관리업체" {...form.register("holdingSource")} /></Field>}
         {sensitiveAccess.unitAccess && <Field label="세대 비밀번호 (제한 정보)"><input className="field" autoComplete="new-password" type="password" {...form.register("accessPassword")} /><span className="mt-1 block text-[11px] text-[#7b7470]">이 수정 화면에서만 확인·변경할 수 있습니다.</span></Field>}
         {sensitiveAccess.propertyContacts && <><Field label="임대인 연락처 (제한 정보)" error={form.formState.errors.ownerPhone?.message}><input className="field" inputMode="tel" type="tel" {...form.register("ownerPhone")} /></Field><Field label="세입자 연락처 (제한 정보)" error={form.formState.errors.tenantPhone?.message}><input className="field" inputMode="tel" type="tel" {...form.register("tenantPhone")} /></Field></>}
       </div>
